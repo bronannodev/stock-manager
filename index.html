@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Tienda Alem</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#059669">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9F6F0; /* Color crema principal */
+        }
+        
+        /* Animaciones personalizadas */
+        .animate-fade-slide {
+            animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes fadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Spinner de carga */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Efecto de resplandor sutil de fondo */
+        .bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(231,223,208,0.8) 0%, rgba(249,246,240,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center relative overflow-hidden text-stone-800">
+
+    <!-- Resplandor decorativo de fondo -->
+    <div class="bg-glow"></div>
+
+    <!-- Contenedor Principal (Tarjeta) -->
+    <div class="w-full max-w-md px-4 sm:px-6 animate-fade-slide">
+        <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 relative overflow-hidden">
+            
+            <!-- Detalle decorativo superior -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-300 via-stone-400 to-stone-300"></div>
+
+            <!-- Cabecera -->
+            <div class="text-center mb-10 mt-2">
+                <img src="./src/assets/logo.png" alt="Tienda Alem" class="h-30 mx-auto mb-4 object-contain">
+                <p class="text-sm text-stone-500 font-medium">Gestión de Stock y Ventas</p>
+            </div>
+
+            <!-- Formulario -->
+            <form id="login-form" class="space-y-6">
+                <!-- Input Email -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Correo Electrónico</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                            </svg>
+                        </div>
+                        <input type="email" id="email" required placeholder="Email"
+                            class="block w-full pl-11 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-transparent transition-all duration-300">
+                    </div>
+                </div>
+
+                <!-- Input Password -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <input type="password" id="password" required placeholder="••••••••"
+                            class="block w-full pl-11 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-transparent transition-all duration-300">
+                    </div>
+                </div>
+
+                <!-- Mensaje de Error (Oculto por defecto) -->
+                <div id="error-message" class="hidden bg-red-50 text-red-600 text-sm py-3 px-4 rounded-xl text-center border border-red-100">
+                    Credenciales incorrectas. Intenta de nuevo.
+                </div>
+
+                <!-- Botón Submit -->
+                <button type="submit" id="submit-btn" 
+                    class="w-full bg-stone-800 text-white font-medium py-3.5 rounded-2xl shadow-lg shadow-stone-800/20 hover:bg-stone-900 hover:shadow-xl hover:shadow-stone-900/30 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-stone-200 active:translate-y-0 active:shadow-md transition-all duration-300 flex items-center justify-center gap-2">
+                    <span id="btn-text">Ingresar al sistema</span>
+                    <div id="btn-spinner" class="spinner"></div>
+                </button>
+            </form>
+            
+            <div class="mt-8 text-center">
+                <p class="text-xs text-stone-400">por @bronannodev</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de lógica de UI conectado a Supabase -->
+    <script type="module">
+        // 1. Importamos tu función real de login
+        import { login } from './src/modules/auth.js';
+
+        const form = document.getElementById('login-form');
+        const btn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('btn-spinner');
+        const errorMessage = document.getElementById('error-message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            // Limpiar errores previos y mostrar estado de carga
+            errorMessage.classList.add('hidden');
+            btn.disabled = true;
+            btn.classList.add('opacity-90', 'cursor-not-allowed');
+            btnText.textContent = 'Verificando...';
+            spinner.style.display = 'block';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // 2. Ejecutamos la autenticación real en Supabase
+                await login(email, password);
+                
+                // 3. Éxito: Mostrar animación y redirigir
+                btnText.textContent = '¡Conectado!';
+                btn.classList.replace('bg-stone-800', 'bg-green-600');
+                btn.classList.replace('hover:bg-stone-900', 'hover:bg-green-700');
+                btn.classList.replace('shadow-stone-800/20', 'shadow-green-600/30');
+                spinner.style.display = 'none';
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html'; // Redirige al sistema
+                }, 500);
+
+            } catch (error) {
+                // 4. Error: Mostrar mensaje exacto de Supabase y restaurar botón
+                
+                // Aquí usamos error.message para ver la respuesta real de Supabase
+                errorMessage.textContent = error.message || 'Credenciales incorrectas. Intenta de nuevo.';
+                errorMessage.classList.remove('hidden');
+                
+                // Animación de agitación
+                form.classList.add('animate-pulse');
+                setTimeout(() => form.classList.remove('animate-pulse'), 500);
+
+                btn.disabled = false;
+                btn.classList.remove('opacity-90', 'cursor-not-allowed');
+                btnText.textContent = 'Ingresar al sistema';
+                spinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

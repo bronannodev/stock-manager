@@ -1,0 +1,10 @@
+{
+    "name": "Tienda Alem POS",
+    "short_name": "Tienda Alem",
+    "description": "Sistema de gestión de inventario y caja",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#F9F6F0",
+    "theme_color": "#059669",
+    "icons": []
+}

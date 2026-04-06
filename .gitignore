@@ -1,0 +1,44 @@
+# Configuración y Variables de Entorno
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Credenciales de Supabase (NUNCA subir al repo)
+src/config/supabase.js
+
+# Dependencias (por si agregas NPM en el futuro)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs y bases de datos locales opcionales
+*.log
+*.sqlite
+*.sqlite3
+
+# Compilados o distribuciones temporales
+dist/
+build/
+.cache/
+
+# Archivos de Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
