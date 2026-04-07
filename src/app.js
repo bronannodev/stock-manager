@@ -37,23 +37,27 @@ window.showToast = (message, type = 'success') => {
     if (!container) return;
 
     const toast = document.createElement('div');
-    const isError = type === 'error';
     
-    toast.className = `flex items-center gap-3 px-5 py-4 rounded-2xl shadow-lg border transform translate-y-10 opacity-0 transition-all duration-300 ${
-        isError ? 'bg-red-50 border-red-100 text-red-600' : 'bg-stone-900 border-stone-800 text-stone-100'
-    }`;
+    const styles = {
+        success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+        error:   'bg-red-50 border-red-200 text-red-800',
+        warning: 'bg-amber-50 border-amber-200 text-amber-800',
+    };
+    const icons = {
+        success: `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`,
+        error:   `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        warning: `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+    };
+    const colorClass = styles[type] || styles.success;
+    const icon = icons[type] || icons.success;
     
-    const iconBase = isError 
-        ? `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-        : `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-
-    toast.innerHTML = `${iconBase} <span class="font-medium text-sm">${message}</span>`;
+    toast.className = `toast-in flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-lg border text-sm font-medium pointer-events-auto ${colorClass}`;
+    toast.innerHTML = `${icon}<span>${message}</span>`;
     container.appendChild(toast);
     
-    setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
     setTimeout(() => {
-        toast.classList.add('opacity-0', 'scale-95');
-        setTimeout(() => toast.remove(), 300);
+        toast.classList.replace('toast-in', 'toast-out');
+        setTimeout(() => toast.remove(), 350);
     }, 3500);
 };
 
@@ -66,6 +70,11 @@ window.openModal = (modalId) => {
     
     overlay.classList.remove('hidden');
     modal.classList.remove('hidden');
+    
+    // Spring animation
+    modal.classList.remove('modal-spring-in');
+    void modal.offsetWidth; // Reflow para reiniciar
+    modal.classList.add('modal-spring-in');
     
     setTimeout(() => {
         overlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -154,6 +163,10 @@ function bindEvents() {
         ui.mobileMenuBtn.addEventListener('click', toggleMobileMenu);
         ui.mobileOverlay.addEventListener('click', closeMobileMenu);
     }
+
+    // Marcar el primer botón del nav como activo al inicio
+    const firstNav = ui.navBtns[0];
+    if (firstNav) firstNav.classList.add('nav-active');
 }
 
 // 2.5 Lógica Menú Móvil
@@ -173,15 +186,23 @@ function closeMobileMenu() {
 
 // 3. Navegación de Pestañas
 function switchTab(targetId) {
-    ui.sections.forEach(sec => sec.classList.add('hidden'));
-    document.getElementById(targetId).classList.remove('hidden');
+    ui.sections.forEach(sec => {
+        sec.classList.add('hidden');
+        sec.classList.remove('section-enter');
+    });
+    const activeSection = document.getElementById(targetId);
+    activeSection.classList.remove('hidden');
+    // Reactivar animación de entrada
+    void activeSection.offsetWidth;
+    activeSection.classList.add('section-enter');
     
+    // Nav active indicator
     ui.navBtns.forEach(btn => {
-        btn.classList.remove('bg-blue-600');
-        btn.classList.add('hover:bg-gray-800');
-        if(btn.dataset.target === targetId) {
-            btn.classList.add('bg-blue-600');
-            btn.classList.remove('hover:bg-gray-800');
+        btn.classList.remove('nav-active', 'bg-stone-800', 'text-white');
+        btn.classList.add('hover:bg-stone-800', 'hover:text-white');
+        if (btn.dataset.target === targetId) {
+            btn.classList.add('nav-active');
+            btn.classList.remove('hover:bg-stone-800', 'hover:text-white');
         }
     });
 
@@ -219,16 +240,20 @@ function renderProductsTable() {
         return;
     }
 
-    // Render Tabla (Desktop)
-    tableBody.innerHTML = state.products.map(p => `
-        <tr class="hover:bg-gray-50 transition border-b border-stone-50">
+    tableBody.innerHTML = state.products.map(p => {
+        const isLowStock = p.stock < 5;
+        const stockEl = isLowStock
+            ? `<span class="badge-stock-critical text-red-600 font-bold text-sm">${p.stock}</span>`
+            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${ p.stock < 15 ? 'bg-amber-50 text-amber-700' : 'bg-stone-100 text-stone-600' }">${p.stock}</span>`;
+        return `
+        <tr class="table-row-anim border-b border-stone-50">
             <td class="p-4 font-medium">${p.name}</td>
             <td class="p-4 capitalize text-stone-500 text-sm">${p.category || '-'}</td>
             <td class="p-4"><span class="bg-amber-50 text-amber-600 font-bold px-2 py-1 rounded-lg text-sm">$${p.cost}</span></td>
             <td class="p-4"><span class="bg-emerald-50 text-emerald-600 font-bold px-2 py-1 rounded-lg text-sm drop-shadow-sm">$${p.price}</span></td>
-            <td class="p-4"><span class="px-2 py-1 bg-stone-100 rounded-lg text-sm ${p.stock < 5 ? 'text-red-600 bg-red-50 font-bold' : ''}">${p.stock}</span></td>
+            <td class="p-4">${stockEl}</td>
             <td class="p-4">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 justify-end">
                     <button onclick="window.openStockModal('${p.id}')" class="p-1.5 bg-emerald-50 text-emerald-500 rounded-lg hover:bg-emerald-100 transition-colors" title="Ingresar Stock">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     </button>
@@ -240,8 +265,8 @@ function renderProductsTable() {
                     </button>
                 </div>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
     
     // Render Cards (Mobile)
     cardsBody.innerHTML = state.products.map(p => `
@@ -407,19 +432,34 @@ async function loadSuppliers() {
 
 function renderSuppliersTable() {
     const tableBody = document.getElementById('suppliers-table-body');
+    const cardsBody = document.getElementById('suppliers-cards-body');
     if (!tableBody) return;
     if (state.suppliers.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-stone-400">Pronto registramos proveedores...</td></tr>`;
+        if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Sin proveedores registrados.</div>`;
         return;
     }
     tableBody.innerHTML = state.suppliers.map(s => `
-        <tr class="hover:bg-gray-50 transition border-b border-stone-50">
+        <tr class="table-row-anim border-b border-stone-50">
             <td class="p-5 font-medium">${s.name}</td>
             <td class="p-5 text-sm">${s.phone || '-'}</td>
             <td class="p-5 text-sm text-stone-500">${s.email || '-'}</td>
             <td class="p-5 text-sm tracking-wider">${s.document || '-'}</td>
         </tr>
     `).join('');
+
+    if (cardsBody) {
+        cardsBody.innerHTML = state.suppliers.map(s => `
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100">
+                <h3 class="font-bold text-stone-900 text-lg mb-1">${s.name}</h3>
+                <div class="mt-3 space-y-2 text-sm">
+                    ${s.phone ? `<div class="flex items-center gap-2 text-stone-600"><span class="text-stone-400 font-medium w-16 shrink-0">Tel.</span> ${s.phone}</div>` : ''}
+                    ${s.email ? `<div class="flex items-center gap-2 text-stone-600"><span class="text-stone-400 font-medium w-16 shrink-0">Email</span> <span class="truncate">${s.email}</span></div>` : ''}
+                    ${s.document ? `<div class="flex items-center gap-2 text-stone-600"><span class="text-stone-400 font-medium w-16 shrink-0">CUIT</span> ${s.document}</div>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 function renderSupplierSelect() {
@@ -482,13 +522,15 @@ function renderCategorySelect() {
 
 function renderCategoriesTable() {
     const tableBody = document.getElementById('categories-table-body');
+    const cardsBody = document.getElementById('categories-cards-body');
     if (!tableBody) return;
     if (state.categories.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="2" class="p-8 text-center text-stone-400">Aún no registraste categorías...</td></tr>`;
+        if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Sin categorías registradas.</div>`;
         return;
     }
     tableBody.innerHTML = state.categories.map(c => `
-        <tr class="hover:bg-gray-50 transition border-b border-stone-50">
+        <tr class="table-row-anim border-b border-stone-50">
             <td class="p-5 font-medium">${c.name}</td>
             <td class="p-5 text-right w-24">
                 <div class="flex items-center justify-end gap-2">
@@ -502,6 +544,27 @@ function renderCategoriesTable() {
             </td>
         </tr>
     `).join('');
+
+    if (cardsBody) {
+        cardsBody.innerHTML = state.categories.map(c => `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    </div>
+                    <span class="font-semibold text-stone-800">${c.name}</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.editCategory('${c.id}')" class="p-2 bg-indigo-50 text-indigo-500 rounded-xl hover:bg-indigo-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    <button onclick="window.deleteCategory('${c.id}')" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 window.openCategoryModal = () => {
@@ -601,15 +664,19 @@ async function loadExpenses() {
 
 function renderExpensesTable() {
     const tableBody = document.getElementById('expenses-table-body');
+    const cardsBody = document.getElementById('expenses-cards-body');
     if (!tableBody) return;
     
     if (state.expenses.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-stone-400">Aún no registraste gastos...</td></tr>`;
+        if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Sin gastos registrados.</div>`;
         return;
     }
 
+    const paymentIcon = { efectivo: '💵', tarjeta: '💳', transferencia: '🏦' };
+
     tableBody.innerHTML = state.expenses.map(e => `
-        <tr class="hover:bg-gray-50 transition border-b border-stone-50">
+        <tr class="table-row-anim border-b border-stone-50">
             <td class="p-5 text-sm">${new Date(e.created_at).toLocaleDateString()}</td>
             <td class="p-5 font-medium">${e.description}</td>
             <td class="p-5 capitalize">${e.category}</td>
@@ -626,6 +693,28 @@ function renderExpensesTable() {
             </td>
         </tr>
     `).join('');
+
+    if (cardsBody) {
+        cardsBody.innerHTML = state.expenses.map(e => `
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex-1 pr-4">
+                        <p class="font-bold text-stone-900 leading-tight">${e.description}</p>
+                        <p class="text-xs text-stone-400 mt-1">${new Date(e.created_at).toLocaleDateString('es-AR')} &bull; <span class="capitalize">${e.category}</span></p>
+                    </div>
+                    <p class="text-xl font-black text-amber-600 shrink-0">$${e.amount}</p>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-stone-50">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1.5 rounded-full">
+                        ${paymentIcon[e.payment_method] || ''} ${e.payment_method}
+                    </span>
+                    <button onclick="window.deleteExpense('${e.id}')" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 async function handleCreateExpense(e) {
@@ -688,17 +777,51 @@ function addToCart() {
 }
 
 function renderCart() {
-    ui.cartBody.innerHTML = state.cart.map((item, index) => `
-        <tr>
-            <td class="py-2">${item.name}</td>
-            <td class="py-2">${item.quantity}</td>
-            <td class="py-2">$${item.unit_price}</td>
-            <td class="py-2 font-bold">$${item.quantity * item.unit_price}</td>
-            <td class="py-2 text-right"><button onclick="window.removeFromCart(${index})" class="text-red-500 font-bold hover:text-red-700">X</button></td>
-        </tr>
-    `).join('');
+    const cartBody = document.getElementById('cart-body');
+    const cartCards = document.getElementById('cart-cards-body');
+
+    if (state.cart.length === 0) {
+        if (cartBody) cartBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-stone-400">El carrito está vacío</td></tr>`;
+        if (cartCards) cartCards.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">El carrito está vacío</div>`;
+        document.getElementById('sale-total').textContent = '$0.00';
+        return;
+    }
 
     const total = state.cart.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+
+    // Tabla desktop
+    if (cartBody) {
+        cartBody.innerHTML = state.cart.map((item, index) => `
+            <tr class="table-row-anim border-b border-stone-50">
+                <td class="p-4 font-medium">${item.name}</td>
+                <td class="p-4 text-center">${item.quantity}</td>
+                <td class="p-4 text-right text-stone-500">$${item.unit_price}</td>
+                <td class="p-4 text-right font-bold">$${(item.quantity * item.unit_price).toFixed(2)}</td>
+                <td class="p-4 text-right">
+                    <button onclick="window.removeFromCart(${index})" class="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Tarjetas móvil
+    if (cartCards) {
+        cartCards.innerHTML = state.cart.map((item, index) => `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center gap-3">
+                <div class="flex-1">
+                    <p class="font-bold text-stone-900">${item.name}</p>
+                    <p class="text-sm text-stone-500 mt-0.5">${item.quantity} u. &times; $${item.unit_price}</p>
+                </div>
+                <p class="font-black text-stone-900 text-lg">$${(item.quantity * item.unit_price).toFixed(2)}</p>
+                <button onclick="window.removeFromCart(${index})" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `).join('');
+    }
+
     document.getElementById('sale-total').textContent = `$${total.toFixed(2)}`;
 }
 
@@ -745,9 +868,9 @@ window.filterSales = async (filter) => {
         const btn = document.getElementById(`btn-filter-${b}`);
         if (!btn) return;
         if (b === filter) {
-            btn.className = 'px-4 py-2 font-medium text-sm rounded-lg transition-all bg-white text-stone-900 shadow-sm';
+            btn.className = 'px-3 py-2 font-medium text-sm rounded-lg transition-all bg-white text-stone-900 shadow-sm';
         } else {
-            btn.className = 'px-4 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900';
+            btn.className = 'px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900';
         }
     });
 
@@ -771,17 +894,21 @@ async function loadSalesHistory(filter) {
 
 function renderSalesHistory() {
     const tableBody = document.getElementById('sales-history-tbody');
+    const cardsBody = document.getElementById('sales-history-cards');
     if (!tableBody) return;
     
     if (state.salesHistory.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-stone-400">No hay ventas registradas en este período.</td></tr>`;
+        if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">No hay ventas en este período.</div>`;
         return;
     }
+
+    const paymentIcon = { efectivo: '💵', tarjeta: '💳', transferencia: '🏦' };
 
     tableBody.innerHTML = state.salesHistory.map(s => {
         const details = s.sale_items.map(item => `<span class="inline-block px-2 py-0.5 bg-stone-100 rounded text-xs mr-1 mb-1">${item.quantity}x ${item.products ? item.products.name : 'Desc'} ($${item.unit_price || 0})</span>`).join('');
         return `
-        <tr class="hover:bg-gray-50 transition border-b border-stone-50">
+        <tr class="table-row-anim border-b border-stone-50">
             <td class="p-5 text-sm">${new Date(s.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</td>
             <td class="p-5 w-full max-w-[200px] whitespace-normal leading-tight">${details}</td>
             <td class="p-5 text-center capitalize">
@@ -799,7 +926,35 @@ function renderSalesHistory() {
             </td>
         </tr>
     `}).join('');
+
+    // Tarjetas móvil
+    if (cardsBody) {
+        cardsBody.innerHTML = state.salesHistory.map(s => {
+            const itemsList = s.sale_items.map(item =>
+                `<span class="inline-block px-2 py-0.5 bg-stone-100 rounded-full text-xs mr-1 mb-1">${item.quantity}x ${item.products ? item.products.name : 'Desc'}</span>`
+            ).join('');
+            return `
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <p class="text-xs text-stone-400 font-medium">${new Date(s.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                        <p class="font-black text-stone-900 text-2xl tracking-tighter mt-1">$${s.total_amount}</p>
+                    </div>
+                    <button onclick="window.deleteSale('${s.id}')" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors mt-1" title="Anular venta">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+                <div class="mb-3 leading-relaxed">${itemsList}</div>
+                <div class="pt-3 border-t border-stone-50">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1.5 rounded-full">
+                        ${paymentIcon[s.payment_method] || ''} ${s.payment_method}
+                    </span>
+                </div>
+            </div>`;
+        }).join('');
+    }
 }
+
 
 window.deleteSale = async (id) => {
     window.showConfirm(
@@ -819,24 +974,42 @@ window.deleteSale = async (id) => {
     );
 };
 
+// Helper: contador animado
+function animateCounter(element, targetValue, prefix = '$', duration = 900) {
+    if (!element) return;
+    element.classList.remove('counter-pop');
+    void element.offsetWidth;
+    element.classList.add('counter-pop');
+    
+    const start = performance.now();
+    const startVal = 0;
+    function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = startVal + (targetValue - startVal) * eased;
+        element.textContent = prefix + value.toFixed(2);
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
 // 7. Lógica de Dashboard
 async function loadDashboard() {
     try {
         const stats = await getDashboardStats();
         
-        // Formateadores Seguros
-        const safeCurrency = (val) => '$' + (Number(val) || 0).toFixed(2);
+        const safeCurrency = (val) => Number(val) || 0;
         
-        document.getElementById('dash-sales').textContent = safeCurrency(stats.totalSales);
-        
+        const salesEl = document.getElementById('dash-sales');
         const cogsEl = document.getElementById('dash-cogs');
-        if (cogsEl) cogsEl.textContent = '-' + safeCurrency(stats.totalCogs);
-        
         const expEl = document.getElementById('dash-expenses');
-        if (expEl) expEl.textContent = '-' + safeCurrency(stats.totalExpenses);
-        
         const netEl = document.getElementById('dash-net-profit');
-        if (netEl) netEl.textContent = safeCurrency(stats.netProfit);
+        
+        animateCounter(salesEl, safeCurrency(stats.totalSales), '$');
+        if (cogsEl) animateCounter(cogsEl, safeCurrency(stats.totalCogs), '-$');
+        if (expEl) animateCounter(expEl, safeCurrency(stats.totalExpenses), '-$');
+        if (netEl) animateCounter(netEl, safeCurrency(stats.netProfit), '$');
         
         // Advanced stats
         const { topSelling } = await getAdvancedStats();
@@ -844,7 +1017,14 @@ async function loadDashboard() {
         const topSalesList = document.getElementById('dash-top-sales');
         if (topSalesList) {
             topSalesList.innerHTML = topSelling.length > 0 ? 
-                topSelling.map(t => `<li class="p-4 flex justify-between"><span>${t.name}</span><span class="font-bold">${t.qty} u.</span></li>`).join('') :
+                topSelling.map((t, i) => `
+                    <li class="p-4 flex justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-5 h-5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold flex items-center justify-center">${i+1}</span>
+                            <span class="font-medium text-stone-800">${t.name}</span>
+                        </div>
+                        <span class="font-bold text-stone-600 text-sm">${t.qty} u.</span>
+                    </li>`).join('') :
                 '<li class="p-6 text-center text-stone-400">Sin datos de ventas...</li>';
         }
 
@@ -852,7 +1032,13 @@ async function loadDashboard() {
         if (lowStockList) {
             const lowStock = [...state.products].sort((a, b) => a.stock - b.stock).slice(0, 5);
             lowStockList.innerHTML = lowStock.length > 0 ?
-                lowStock.map(p => `<li class="p-4 flex justify-between"><span>${p.name}</span><span class="font-bold text-red-500">${p.stock} u.</span></li>`).join('') :
+                lowStock.map(p => {
+                    const isCrit = p.stock < 5;
+                    return `<li class="p-4 flex justify-between items-center">
+                        <span class="font-medium text-stone-700">${p.name}</span>
+                        <span class="${ isCrit ? 'badge-stock-critical text-red-600 font-bold' : 'text-amber-600 font-bold' } text-sm">${p.stock} u.</span>
+                    </li>`;
+                }).join('') :
                 '<li class="p-6 text-center text-stone-400">Excelente stock...</li>';
         }
 
@@ -860,7 +1046,11 @@ async function loadDashboard() {
         if (highStockList) {
             const highStock = [...state.products].sort((a, b) => b.stock - a.stock).slice(0, 5);
             highStockList.innerHTML = highStock.length > 0 ?
-                highStock.map(p => `<li class="p-4 flex justify-between"><span>${p.name}</span><span class="font-bold text-indigo-500">${p.stock} u.</span></li>`).join('') :
+                highStock.map(p => `
+                    <li class="p-4 flex justify-between items-center">
+                        <span class="font-medium text-stone-700">${p.name}</span>
+                        <span class="font-bold text-indigo-500 text-sm">${p.stock} u.</span>
+                    </li>`).join('') :
                 '<li class="p-6 text-center text-stone-400">No hay stock...</li>';
         }
 
