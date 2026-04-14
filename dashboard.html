@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,24 +14,64 @@
             font-family: 'Inter', sans-serif;
             background-color: #F9F6F0;
         }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e;
+        }
 
         /* Sistema Responsivo Híbrido */
         @media (min-width: 768px) {
-            .mobile-view { display: none !important; }
-            .desktop-view { display: block !important; }
+            .mobile-view {
+                display: none !important;
+            }
+
+            .desktop-view {
+                display: block !important;
+            }
         }
+
         @media (max-width: 767px) {
-            .mobile-view { display: block !important; }
-            .desktop-view { display: none !important; }
+            .mobile-view {
+                display: block !important;
+            }
+
+            .desktop-view {
+                display: none !important;
+            }
         }
 
         /* ================================================
@@ -39,21 +80,48 @@
 
         /* 1. Toast mejorado — slide desde la derecha */
         @keyframes toastIn {
-            from { transform: translateX(110%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
+
         @keyframes toastOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(110%); opacity: 0; }
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(110%);
+                opacity: 0;
+            }
         }
-        .toast-in { animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .toast-out { animation: toastOut 0.3s ease-in forwards; }
+
+        .toast-in {
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .toast-out {
+            animation: toastOut 0.3s ease-in forwards;
+        }
 
         /* 2. Skeleton loader con shimmer */
         @keyframes shimmer {
-            0% { background-position: -800px 0; }
-            100% { background-position: 800px 0; }
+            0% {
+                background-position: -800px 0;
+            }
+
+            100% {
+                background-position: 800px 0;
+            }
         }
+
         .skeleton {
             background: linear-gradient(90deg, #e7e5e4 25%, #f5f5f4 50%, #e7e5e4 75%);
             background-size: 800px 100%;
@@ -63,18 +131,28 @@
 
         /* 3. Badge pulsante para stock crítico */
         @keyframes pulseRing {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
         }
+
         .badge-stock-critical {
             display: inline-flex;
             align-items: center;
             gap: 5px;
         }
+
         .badge-stock-critical::before {
             content: '';
             display: inline-block;
-            width: 7px; height: 7px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #ef4444;
             position: relative;
@@ -82,35 +160,61 @@
             box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
             animation: pulseRingBadge 1.5s infinite;
         }
+
         @keyframes pulseRingBadge {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
         }
 
         /* 4. Modal spring animation */
         @keyframes modalSpringIn {
-            from { opacity: 0; transform: scale(0.88) translateY(12px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.88) translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
-        .modal-spring-in { animation: modalSpringIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important; }
+
+        .modal-spring-in {
+            animation: modalSpringIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+        }
 
         /* 5. Barra del nav con indicador verde */
         .nav-btn {
             position: relative;
             transition: all 0.2s ease !important;
         }
+
         .nav-btn::before {
             content: '';
             position: absolute;
-            left: 0; top: 50%;
+            left: 0;
+            top: 50%;
             transform: translateY(-50%) scaleY(0);
-            width: 3px; height: 60%;
+            width: 3px;
+            height: 60%;
             background: #10b981;
             border-radius: 0 3px 3px 0;
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .nav-btn.nav-active::before { transform: translateY(-50%) scaleY(1); }
+
+        .nav-btn.nav-active::before {
+            transform: translateY(-50%) scaleY(1);
+        }
+
         .nav-btn.nav-active {
             background-color: rgba(16, 185, 129, 0.1) !important;
             color: #10b981 !important;
@@ -120,12 +224,19 @@
         .table-row-anim {
             transition: background-color 0.15s ease;
         }
+
         .table-row-anim td:first-child {
             border-left: 3px solid transparent;
             transition: border-color 0.2s ease;
         }
-        .table-row-anim:hover { background-color: #fafaf9 !important; }
-        .table-row-anim:hover td:first-child { border-left-color: #059669; }
+
+        .table-row-anim:hover {
+            background-color: #fafaf9 !important;
+        }
+
+        .table-row-anim:hover td:first-child {
+            border-left-color: #059669;
+        }
 
         /* 7. Input con focus animado */
         .input-fancy {
@@ -133,6 +244,7 @@
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
             background: #fafaf9 !important;
         }
+
         .input-fancy:focus {
             border-color: #292524 !important;
             background: white !important;
@@ -145,33 +257,50 @@
             position: relative;
             overflow: hidden;
         }
+
         .btn-ripple::after {
             content: '';
             position: absolute;
             border-radius: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.3);
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
             transform: translate(-50%, -50%);
             transition: width 0.5s ease, height 0.5s ease, opacity 0.5s ease;
             opacity: 0;
         }
+
         .btn-ripple:active::after {
-            width: 400px; height: 400px;
+            width: 400px;
+            height: 400px;
             opacity: 1;
             transition: 0s;
         }
 
         /* 9. Contador animado */
         @keyframes counterPop {
-            from { transform: translateY(8px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(8px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
-        .counter-pop { animation: counterPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .counter-pop {
+            animation: counterPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* 10. Progress bar */
         @keyframes progressFill {
-            from { width: 0%; }
+            from {
+                width: 0%;
+            }
         }
+
         .progress-animated {
             animation: progressFill 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             animation-delay: 0.2s;
@@ -180,86 +309,197 @@
 
         /* 11. Entrada de sección */
         @keyframes sectionIn {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .section-enter { animation: sectionIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .section-enter {
+            animation: sectionIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* 12. Shake error */
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-8px);
+            }
+
+            40% {
+                transform: translateX(8px);
+            }
+
+            60% {
+                transform: translateX(-5px);
+            }
+
+            80% {
+                transform: translateX(5px);
+            }
         }
-        .shake { animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+        .shake {
+            animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
 
         /* 13. Dot loader */
         @keyframes dotBounce {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-            40% { transform: scale(1); opacity: 1; }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.4;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
-        .dot-loader { display: inline-flex; gap: 4px; align-items: center; }
+
+        .dot-loader {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
         .dot-loader span {
             display: inline-block;
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #a8a29e;
             animation: dotBounce 1.2s infinite ease-in-out;
         }
-        .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
-        .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+        .dot-loader span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot-loader span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
     </style>
 </head>
+
 <body class="h-screen w-full flex flex-col md:flex-row overflow-hidden text-stone-800">
 
     <!-- Mobile Header -->
-    <header class="md:hidden bg-stone-900 text-stone-300 p-4 flex justify-between items-center shadow-md shrink-0 relative z-20">
+    <header
+        class="md:hidden bg-stone-900 text-stone-300 p-4 flex justify-between items-center shadow-md shrink-0 relative z-20">
         <img src="./src/assets/logo.png" alt="Tienda Alem" class="h-10 object-contain">
-        <button id="mobile-menu-btn" class="p-2 text-stone-300 hover:text-white rounded-md focus:outline-none hover:bg-stone-800">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        <button id="mobile-menu-btn"
+            class="p-2 text-stone-300 hover:text-white rounded-md focus:outline-none hover:bg-stone-800">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
         </button>
     </header>
 
     <!-- Mobile Overlay -->
-    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-30 hidden backdrop-blur-sm transition-opacity duration-300 opacity-0 md:hidden pointer-events-none"></div>
+    <div id="mobile-overlay"
+        class="fixed inset-0 bg-black/50 z-30 hidden backdrop-blur-sm transition-opacity duration-300 opacity-0 md:hidden pointer-events-none">
+    </div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-40 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+    <aside id="sidebar"
+        class="w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-40 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
         <div class="p-4 border-b border-stone-800 flex justify-center items-center h-32 bg-stone-900/50">
             <img src="./src/assets/logo.png" alt="Tienda Alem" class="h-20 w-auto object-contain">
         </div>
         <nav class="flex-1 p-4 space-y-2 mt-4">
-            <button data-target="view-products" class="nav-btn w-full text-left px-4 py-3 rounded-xl bg-stone-800 text-white font-medium transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <button data-target="view-products"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl bg-stone-800 text-white font-medium transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
                 Productos
             </button>
-            <button data-target="view-sales" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <button data-target="view-sales"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                    </path>
+                </svg>
                 Punto de Venta
             </button>
-            <button data-target="view-sales-history" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <button data-target="view-sales-history"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
                 Reportes Ventas
             </button>
-            <button data-target="view-dashboard" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <button data-target="view-dashboard"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
                 Reportes general
             </button>
-            <button data-target="view-suppliers" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <button data-target="view-debtors"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Deudores
+            </button>
+            <button data-target="view-resellers"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5V4H2v16h5m2 0h6m-3-12v4m0 0l-2-2m2 2l2-2"></path>
+                </svg>
+                Revendedores
+            </button>
+            <button data-target="view-suppliers"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                    </path>
+                </svg>
                 Proveedores
             </button>
-            <button data-target="view-categories" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+            <button data-target="view-categories"
+                class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-stone-800 hover:text-white transition-all duration-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                    </path>
+                </svg>
                 Categorías
             </button>
         </nav>
         <div class="p-6 border-t border-stone-800">
-            <div id="user-email" class="text-xs text-stone-500 font-medium mb-3 px-2 truncate uppercase tracking-wider">Verificando...</div>
-            <button id="logout-btn" class="w-full text-left px-4 py-2 text-stone-400 hover:text-red-400 hover:bg-stone-800/50 rounded-lg transition-colors flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            <div id="user-email" class="text-xs text-stone-500 font-medium mb-3 px-2 truncate uppercase tracking-wider">
+                Verificando...</div>
+            <button id="logout-btn"
+                class="w-full text-left px-4 py-2 text-stone-400 hover:text-red-400 hover:bg-stone-800/50 rounded-lg transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
                 Cerrar Sesión
             </button>
         </div>
@@ -267,9 +507,10 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-5 md:p-10 overflow-y-auto relative bg-[#F9F6F0]">
-        
+
         <!-- Pantalla de Carga -->
-        <div id="loading-overlay" class="absolute inset-0 bg-[#F9F6F0] z-50 flex flex-col items-center justify-center gap-4">
+        <div id="loading-overlay"
+            class="absolute inset-0 bg-[#F9F6F0] z-50 flex flex-col items-center justify-center gap-4">
             <div class="dot-loader">
                 <span></span><span></span><span></span>
             </div>
@@ -283,17 +524,21 @@
                     <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Inventario</h2>
                     <p class="text-stone-500 mt-1">Gestiona tu catálogo y controla el stock</p>
                 </div>
-                <button onclick="window.openModal('modal-product')" class="btn-ripple w-full sm:w-auto justify-center bg-stone-900 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-stone-900/20 hover:bg-stone-800 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <button onclick="window.openModal('modal-product')"
+                    class="btn-ripple w-full sm:w-auto justify-center bg-stone-900 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-stone-900/20 hover:bg-stone-800 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     Nuevo Producto
                 </button>
             </div>
-            
+
             <!-- Visión Escritorio (Tabla) -->
             <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                        <thead
+                            class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                             <tr>
                                 <th class="p-5">Producto</th>
                                 <th class="p-5">Categoría</th>
@@ -304,7 +549,9 @@
                             </tr>
                         </thead>
                         <tbody id="products-table-body" class="divide-y divide-stone-50">
-                            <tr><td colspan="6" class="p-8 text-center text-stone-400">Cargando datos...</td></tr>
+                            <tr>
+                                <td colspan="6" class="p-8 text-center text-stone-400">Cargando datos...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -312,7 +559,8 @@
 
             <!-- Visión Móvil (Tarjetas) -->
             <div class="mobile-view space-y-4" id="products-cards-body">
-                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Cargando datos...</div>
+                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                    Cargando datos...</div>
             </div>
         </section>
 
@@ -322,24 +570,30 @@
                 <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Punto de Venta</h2>
                 <p class="text-stone-500 mt-1">Registra nuevas transacciones</p>
             </div>
-            
+
             <!-- Selector de producto -->
             <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100 mb-5">
                 <h3 class="font-semibold text-stone-800 mb-4">Agregar al carrito</h3>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <select id="sale-product-select" class="flex-1 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all"></select>
-                    <input type="number" id="sale-qty" value="1" min="1" class="w-full sm:w-24 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-center text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all">
-                    <button id="btn-add-to-cart" class="btn-ripple w-full sm:w-auto justify-center bg-stone-800 text-white hover:bg-stone-900 px-6 py-3.5 rounded-2xl font-medium transition-colors">+ Añadir</button>
+                    <select id="sale-product-select"
+                        class="flex-1 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all"></select>
+                    <input type="number" id="sale-qty" value="1" min="1"
+                        class="w-full sm:w-24 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-center text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all">
+                    <button id="btn-add-to-cart"
+                        class="btn-ripple w-full sm:w-auto justify-center bg-stone-800 text-white hover:bg-stone-900 px-6 py-3.5 rounded-2xl font-medium transition-colors">+
+                        Añadir</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <!-- Carrito Desktop -->
                 <div class="lg:col-span-2">
-                    <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden min-h-[200px]">
+                    <div
+                        class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden min-h-[200px]">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left whitespace-nowrap">
-                                <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                                <thead
+                                    class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                                     <tr>
                                         <th class="p-5">Descripción</th>
                                         <th class="p-5 w-24 text-center">Cant.</th>
@@ -349,14 +603,19 @@
                                     </tr>
                                 </thead>
                                 <tbody id="cart-body" class="divide-y divide-stone-50">
-                                    <tr><td colspan="5" class="p-10 text-center text-stone-400">El carrito está vacío</td></tr>
+                                    <tr>
+                                        <td colspan="5" class="p-10 text-center text-stone-400">El carrito está vacío
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <!-- Carrito Móvil -->
                     <div class="mobile-view space-y-3" id="cart-cards-body">
-                        <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">El carrito está vacío</div>
+                        <div
+                            class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                            El carrito está vacío</div>
                     </div>
                 </div>
 
@@ -367,15 +626,32 @@
                         <span class="text-stone-500 font-medium text-sm">Total a cobrar</span>
                         <span class="text-4xl font-bold text-stone-900 tracking-tighter" id="sale-total">$0.00</span>
                     </div>
+
+                    <div class="mb-4 bg-stone-50/50 rounded-2xl border border-stone-100 p-2">
+                        <label
+                            class="flex items-center gap-3 cursor-pointer p-2 rounded-xl hover:bg-white transition-colors">
+                            <input type="checkbox" id="sale-is-pending"
+                                class="w-5 h-5 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 transition-all cursor-pointer accent-emerald-600">
+                            <span class="text-sm font-bold text-stone-800 select-none">Marcar como Pago Pendiente</span>
+                        </label>
+                        <div id="sale-client-name-container" class="mt-2 hidden fade-in pl-1 pb-1 px-2">
+                            <input type="text" id="sale-client-name" placeholder="Nombre completo del cliente"
+                                class="input-fancy w-full p-3 border border-stone-200 rounded-xl text-stone-800 placeholder-stone-400 text-sm">
+                        </div>
+                    </div>
+
                     <div class="mb-5 space-y-2">
-                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Método de Pago</label>
-                        <select id="sale-payment-method" class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all cursor-pointer">
+                        <label class="block text-xs font-semibold text-stone-500 uppercase tracking-wider">Método de
+                            Pago</label>
+                        <select id="sale-payment-method"
+                            class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all cursor-pointer">
                             <option value="efectivo">💵 Efectivo</option>
                             <option value="tarjeta">💳 Tarjeta (Débito/Crédito)</option>
                             <option value="transferencia">🏦 Transferencia</option>
                         </select>
                     </div>
-                    <button id="btn-confirm-sale" class="btn-ripple w-full bg-emerald-600 text-white p-4 rounded-2xl font-semibold text-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button id="btn-confirm-sale"
+                        class="btn-ripple w-full bg-emerald-600 text-white p-4 rounded-2xl font-semibold text-lg shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                         Confirmar Venta
                     </button>
                 </div>
@@ -390,10 +666,14 @@
                     <p class="text-stone-500 mt-1">Análisis, búsquedas y anulación de facturas</p>
                 </div>
                 <div class="flex bg-stone-100 p-1 rounded-xl self-start sm:self-auto">
-                    <button onclick="window.filterSales('today')" id="btn-filter-today" class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Hoy</button>
-                    <button onclick="window.filterSales('week')" id="btn-filter-week" class="px-3 py-2 font-medium text-sm rounded-lg transition-all bg-white text-stone-900 shadow-sm">Semana</button>
-                    <button onclick="window.filterSales('month')" id="btn-filter-month" class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Mes</button>
-                    <button onclick="window.filterSales('all')" id="btn-filter-all" class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Todo</button>
+                    <button onclick="window.filterSales('today')" id="btn-filter-today"
+                        class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Hoy</button>
+                    <button onclick="window.filterSales('week')" id="btn-filter-week"
+                        class="px-3 py-2 font-medium text-sm rounded-lg transition-all bg-white text-stone-900 shadow-sm">Semana</button>
+                    <button onclick="window.filterSales('month')" id="btn-filter-month"
+                        class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Mes</button>
+                    <button onclick="window.filterSales('all')" id="btn-filter-all"
+                        class="px-3 py-2 font-medium text-sm rounded-lg transition-all text-stone-500 hover:text-stone-900">Todo</button>
                 </div>
             </div>
 
@@ -401,7 +681,8 @@
             <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                        <thead
+                            class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                             <tr>
                                 <th class="p-5 w-40">Fecha y Hora</th>
                                 <th class="p-5">Detalle Artículos</th>
@@ -411,14 +692,17 @@
                             </tr>
                         </thead>
                         <tbody id="sales-history-tbody" class="divide-y divide-stone-50">
-                            <tr><td colspan="5" class="p-8 text-center text-stone-400">Cargando reportes...</td></tr>
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-stone-400">Cargando reportes...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <!-- Móvil tarjetas -->
             <div class="mobile-view space-y-4" id="sales-history-cards">
-                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Cargando reportes...</div>
+                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                    Cargando reportes...</div>
             </div>
         </section>
 
@@ -429,65 +713,48 @@
                     <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Métricas</h2>
                     <p class="text-stone-500 mt-1">Visión general del negocio</p>
                 </div>
-                <button id="btn-refresh-dash" class="w-full sm:w-auto justify-center text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-stone-100">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                <button id="btn-refresh-dash"
+                    class="w-full sm:w-auto justify-center text-stone-500 hover:text-stone-900 transition-colors flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-stone-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
+                    </svg>
                     Actualizar
                 </button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+            <div class="mb-8 max-w-md">
                 <!-- Tarjeta: Ventas Totales -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-stone-50 rounded-2xl flex items-center justify-center text-stone-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div
+                            class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
                         </div>
-                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Ventas Brutas</h3>
+                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Ventas Brutas Totales
+                        </h3>
                     </div>
-                    <p class="text-3xl font-bold text-stone-900 tracking-tighter" id="dash-sales">$0.00</p>
-                </div>
-
-                <!-- Tarjeta: Costo COGS -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Costo Mercadería</h3>
-                    </div>
-                    <p class="text-3xl font-bold text-amber-600 tracking-tighter" id="dash-cogs">-$0.00</p>
-                </div>
-
-                <!-- Tarjeta: Gastos Fijos -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-                        </div>
-                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Gastos Extras</h3>
-                    </div>
-                    <p class="text-3xl font-bold text-red-500 tracking-tighter" id="dash-expenses">-$0.00</p>
-                </div>
-
-                <!-- Tarjeta: GANANCIA NETA -->
-                <div class="bg-gradient-to-br from-emerald-600 to-emerald-800 p-6 rounded-3xl shadow-lg shadow-emerald-600/30 flex flex-col justify-between text-white border border-emerald-500">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white backdrop-blur-sm">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <h3 class="text-emerald-50 text-xs font-semibold uppercase tracking-wider">Ganancia Neta</h3>
-                    </div>
-                    <p class="text-4xl font-black tracking-tight" id="dash-net-profit">$0.00</p>
+                    <p class="text-4xl font-black text-stone-900 tracking-tighter" id="dash-sales">$0.00</p>
                 </div>
             </div>
 
             <!-- Grillas de Reportes -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 <!-- Más Vendidos -->
                 <div class="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden flex flex-col">
                     <div class="p-6 border-b border-stone-100 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg></div>
+                        <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z">
+                                </path>
+                            </svg></div>
                         <h3 class="font-bold text-stone-900">Productos Estrella</h3>
                     </div>
                     <div class="p-0 overflow-y-auto max-h-[300px]">
@@ -500,7 +767,12 @@
                 <!-- Crítico / Sin Stock -->
                 <div class="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden flex flex-col">
                     <div class="p-6 border-b border-stone-100 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
+                        <div class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><svg
+                                class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg></div>
                         <h3 class="font-bold text-stone-900">Requieren Reposición</h3>
                     </div>
                     <div class="p-0 overflow-y-auto max-h-[300px]">
@@ -513,7 +785,11 @@
                 <!-- Mayor Acumulación -->
                 <div class="bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden flex flex-col">
                     <div class="p-6 border-b border-stone-100 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></div>
+                        <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg></div>
                         <h3 class="font-bold text-stone-900">Más Acumulados</h3>
                     </div>
                     <div class="p-0 overflow-y-auto max-h-[300px]">
@@ -528,7 +804,7 @@
 
         <!-- Vista: Proveedores y Gastos -->
         <section id="view-suppliers" class="view-section hidden fade-in section-enter space-y-12">
-            
+
             <!-- Bloque Proveedores -->
             <div>
                 <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6">
@@ -536,17 +812,22 @@
                         <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Proveedores</h2>
                         <p class="text-stone-500 mt-1">Directorio de contactos comerciales</p>
                     </div>
-                    <button onclick="window.openModal('modal-supplier')" class="w-full sm:w-auto justify-center bg-stone-900 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-stone-900/20 hover:bg-stone-800 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <button onclick="window.openModal('modal-supplier')"
+                        class="w-full sm:w-auto justify-center bg-stone-900 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-stone-900/20 hover:bg-stone-800 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
                         Nuevo Proveedor
                     </button>
                 </div>
-                
+
                 <!-- Desktop -->
                 <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
-                            <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                            <thead
+                                class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                                 <tr>
                                     <th class="p-5">Razón Social</th>
                                     <th class="p-5">Teléfono</th>
@@ -555,14 +836,18 @@
                                 </tr>
                             </thead>
                             <tbody id="suppliers-table-body" class="divide-y divide-stone-50">
-                                <tr><td colspan="4" class="p-8 text-center text-stone-400">Pronto registramos proveedores...</td></tr>
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-stone-400">Pronto registramos
+                                        proveedores...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <!-- Móvil tarjetas -->
                 <div class="mobile-view space-y-4" id="suppliers-cards-body">
-                    <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Cargando proveedores...</div>
+                    <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                        Cargando proveedores...</div>
                 </div>
             </div>
 
@@ -573,17 +858,22 @@
                         <h3 class="text-2xl font-bold text-stone-900 tracking-tight">Historial de Gastos</h3>
                         <p class="text-stone-500 mt-1 text-sm">Registro de compras operativas y a proveedores</p>
                     </div>
-                    <button onclick="window.openModal('modal-expense')" class="w-full sm:w-auto justify-center bg-amber-500 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 hover:bg-amber-600 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <button onclick="window.openModal('modal-expense')"
+                        class="w-full sm:w-auto justify-center bg-amber-500 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-amber-500/20 hover:bg-amber-600 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
                         Registrar Gasto
                     </button>
                 </div>
-                
+
                 <!-- Desktop -->
                 <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
-                            <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                            <thead
+                                class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                                 <tr>
                                     <th class="p-5">Fecha</th>
                                     <th class="p-5">Descripción del Gasto</th>
@@ -594,14 +884,17 @@
                                 </tr>
                             </thead>
                             <tbody id="expenses-table-body" class="divide-y divide-stone-50">
-                                <tr><td colspan="5" class="p-8 text-center text-stone-400">Cargando gastos...</td></tr>
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-stone-400">Cargando gastos...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <!-- Móvil tarjetas -->
                 <div class="mobile-view space-y-4" id="expenses-cards-body">
-                    <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Cargando gastos...</div>
+                    <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                        Cargando gastos...</div>
                 </div>
             </div>
         </section>
@@ -613,31 +906,97 @@
                     <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Categorías</h2>
                     <p class="text-stone-500 mt-1">Gestión de familias de productos</p>
                 </div>
-                <button onclick="window.openCategoryModal()" class="w-full sm:w-auto justify-center bg-indigo-500 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-600 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <button onclick="window.openCategoryModal()"
+                    class="w-full sm:w-auto justify-center bg-indigo-500 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-600 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     Añadir Categoría
                 </button>
             </div>
-            
+
             <!-- Desktop -->
             <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                        <thead
+                            class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
                             <tr>
                                 <th class="p-5">Nombre de Categoría</th>
                                 <th class="p-5 text-right w-24">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="categories-table-body" class="divide-y divide-stone-50">
-                            <tr><td colspan="2" class="p-8 text-center text-stone-400">Cargando categorías...</td></tr>
+                            <tr>
+                                <td colspan="2" class="p-8 text-center text-stone-400">Cargando categorías...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <!-- Móvil tarjetas -->
             <div class="mobile-view space-y-3" id="categories-cards-body">
-                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Cargando categorías...</div>
+                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                    Cargando categorías...</div>
+            </div>
+        </section>
+
+        <!-- Vista: Deudores -->
+        <section id="view-debtors" class="view-section hidden fade-in section-enter">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Cuentas Corrientes</h2>
+                    <p class="text-stone-500 mt-1">Gestión de deudores y pagos pendientes</p>
+                </div>
+            </div>
+
+            <div class="desktop-view bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead
+                            class="bg-stone-50 border-b border-stone-100 text-stone-500 text-xs uppercase tracking-wider font-semibold">
+                            <tr>
+                                <th class="p-5">Cliente</th>
+                                <th class="p-5">Fecha Pedido</th>
+                                <th class="p-5 text-right">Deuda</th>
+                                <th class="p-5 text-right w-36">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="debtors-table-body" class="divide-y divide-stone-50">
+                            <tr>
+                                <td colspan="4" class="p-8 text-center text-stone-400">Cargando deudores...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mobile-view space-y-4" id="debtors-cards-body">
+                <div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">
+                    Cargando deudores...</div>
+            </div>
+        </section>
+
+        <!-- Vista: Revendedores -->
+        <section id="view-resellers" class="view-section hidden fade-in section-enter">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-900 tracking-tight">Revendedores</h2>
+                    <p class="text-stone-500 mt-1">Controla mercadería consignada a terceros</p>
+                </div>
+                <button onclick="window.openResellerModal()"
+                    class="w-full sm:w-auto justify-center bg-stone-900 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-stone-900/20 hover:bg-stone-800 hover:-translate-y-0.5 transition-all font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Añadir Vendedor
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="resellers-cards-container">
+                <div
+                    class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm col-span-full">
+                    Cargando revendedores...</div>
             </div>
         </section>
 
@@ -647,180 +1006,402 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
     <!-- Contenedor Global Modales -->
-    <div id="global-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none hidden">
-        
+    <div id="global-modal"
+        class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-[60] flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none hidden">
+
         <!-- Modal Global Confirmación -->
-        <div id="modal-confirm" class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8">
+        <div id="modal-confirm"
+            class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8">
             <div class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-5 mx-auto">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
             </div>
-            <h3 class="text-xl font-bold text-center text-stone-900 tracking-tight mb-2" id="confirm-title">¿Estás seguro?</h3>
+            <h3 class="text-xl font-bold text-center text-stone-900 tracking-tight mb-2" id="confirm-title">¿Estás
+                seguro?</h3>
             <p class="text-stone-500 text-sm text-center mb-8" id="confirm-desc">Esta acción no se puede deshacer.</p>
-            
+
             <div class="flex gap-3">
-                <button type="button" onclick="window.closeConfirmModal()" class="flex-1 px-5 py-3 text-stone-600 font-semibold bg-stone-100 hover:bg-stone-200 rounded-2xl transition-colors">Cancelar</button>
-                <button type="button" id="btn-confirm-action" class="flex-1 px-5 py-3 bg-red-500 font-semibold text-white rounded-2xl shadow hover:bg-red-600 transition-colors">Sí, Confirmar</button>
+                <button type="button" onclick="window.closeConfirmModal()"
+                    class="flex-1 px-5 py-3 text-stone-600 font-semibold bg-stone-100 hover:bg-stone-200 rounded-2xl transition-colors">Cancelar</button>
+                <button type="button" id="btn-confirm-action"
+                    class="flex-1 px-5 py-3 bg-red-500 font-semibold text-white rounded-2xl shadow hover:bg-red-600 transition-colors">Sí,
+                    Confirmar</button>
             </div>
         </div>
 
         <!-- Modal: Ingresar Stock -->
-        <div id="modal-stock" class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
+        <div id="modal-stock"
+            class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
             <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
             </div>
             <h3 class="text-2xl font-bold text-stone-900 tracking-tight">Ingresar Stock</h3>
-            <p class="text-stone-500 text-sm mt-1 mb-6">Suma unidades al inventario de <span id="label-stock-prod" class="font-bold text-stone-800"></span>.</p>
-            
+            <p class="text-stone-500 text-sm mt-1 mb-6">Suma unidades al inventario de <span id="label-stock-prod"
+                    class="font-bold text-stone-800"></span>.</p>
+
             <form id="form-stock" class="space-y-4">
                 <input type="hidden" id="stock-prod-id">
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Unidades Ingresadas</label>
-                    <input type="number" id="stock-qty" placeholder="Ej. 10" min="1" step="1" class="input-fancy w-full p-4 text-xl font-bold rounded-2xl text-stone-800 placeholder-stone-300" required>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Unidades
+                        Ingresadas</label>
+                    <input type="number" id="stock-qty" placeholder="Ej. 10" min="1" step="1"
+                        class="input-fancy w-full p-4 text-xl font-bold rounded-2xl text-stone-800 placeholder-stone-300"
+                        required>
                 </div>
                 <div class="flex gap-3 mt-8 pt-2">
-                    <button type="button" onclick="window.closeModal()" class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
-                    <button type="submit" class="btn-ripple flex-1 px-5 py-3.5 bg-emerald-500 font-semibold text-white rounded-2xl shadow hover:bg-emerald-600 transition-colors">Sumar</button>
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-emerald-500 font-semibold text-white rounded-2xl shadow hover:bg-emerald-600 transition-colors">Sumar</button>
                 </div>
             </form>
         </div>
 
         <!-- Modal: Nueva Categoría -->
-        <div id="modal-category" class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
+        <div id="modal-category"
+            class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
             <h3 class="text-2xl font-bold text-stone-900 tracking-tight" id="cat-modal-title">Añadir Categoría</h3>
             <p class="text-stone-500 text-sm mt-1 mb-6">Registra o edita un grupo de productos.</p>
             <form id="form-category" class="space-y-4">
                 <input type="hidden" id="cat-id">
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Nombre</label>
-                    <input type="text" id="cat-name" placeholder="Ej. Pantalones" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                    <label
+                        class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Nombre</label>
+                    <input type="text" id="cat-name" placeholder="Ej. Pantalones"
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                 </div>
                 <div class="flex gap-3 mt-8 pt-2">
-                    <button type="button" onclick="window.closeModal()" class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
-                    <button type="submit" class="btn-ripple flex-1 px-5 py-3.5 bg-indigo-500 font-semibold text-white rounded-2xl shadow hover:bg-indigo-600 transition-colors">Guardar</button>
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-indigo-500 font-semibold text-white rounded-2xl shadow hover:bg-indigo-600 transition-colors">Guardar</button>
                 </div>
             </form>
         </div>
 
         <!-- Modal: Nuevo Producto -->
-        <div id="modal-product" class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
+        <div id="modal-product"
+            class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
             </div>
             <h3 class="text-2xl font-bold text-stone-900 tracking-tight">Añadir Producto</h3>
-            <p class="text-stone-500 text-sm mt-1 mb-6">Completa la ficha para registrar nueva mercadería en tu catálogo.</p>
-            
+            <p class="text-stone-500 text-sm mt-1 mb-6">Completa la ficha para registrar nueva mercadería en tu
+                catálogo.</p>
+
             <form id="form-product" class="space-y-4">
                 <input type="hidden" id="prod-id">
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Nombre</label>
-                    <input type="text" id="prod-name" placeholder="Ej. Remera" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                    <label
+                        class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Nombre</label>
+                    <input type="text" id="prod-name" placeholder="Ej. Remera"
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Costo ($)</label>
-                        <input type="number" id="prod-cost" step="0.01" placeholder="0.00" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Costo
+                            ($)</label>
+                        <input type="number" id="prod-cost" step="0.01" placeholder="0.00"
+                            class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Precio ($)</label>
-                        <input type="number" id="prod-price" step="0.01" placeholder="0.00" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Precio
+                            ($)</label>
+                        <input type="number" id="prod-price" step="0.01" placeholder="0.00"
+                            class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Categoría</label>
+                    <label
+                        class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Categoría</label>
                     <div class="flex gap-2">
-                        <select id="prod-category" class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer" required>
+                        <select id="prod-category"
+                            class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer"
+                            required>
                             <option value="">Cargando categorías...</option>
                         </select>
-                        <button type="button" onclick="window.closeModal(); window.openModal('modal-category')" class="px-5 bg-indigo-50 text-indigo-600 font-bold rounded-2xl hover:bg-indigo-100 transition-colors" title="Añadir Categoría">
+                        <button type="button" onclick="window.closeModal(); window.openModal('modal-category')"
+                            class="px-5 bg-indigo-50 text-indigo-600 font-bold rounded-2xl hover:bg-indigo-100 transition-colors"
+                            title="Añadir Categoría">
                             +
                         </button>
                     </div>
                 </div>
                 <div class="flex gap-3 mt-8 pt-2">
-                    <button type="button" onclick="window.closeModal()" class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
-                    <button type="submit" class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar Producto</button>
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar
+                        Producto</button>
                 </div>
             </form>
         </div>
 
         <!-- Modal: Nuevo Proveedor -->
-        <div id="modal-supplier" class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
+        <div id="modal-supplier"
+            class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
             <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                    </path>
+                </svg>
             </div>
             <h3 class="text-2xl font-bold text-stone-900 tracking-tight">Nuevo Proveedor</h3>
             <p class="text-stone-500 text-sm mt-1 mb-6">Agrega los datos de contacto de tu distribuidor o prestador.</p>
-            
+
             <form id="form-supplier" class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Razón Social</label>
-                    <input type="text" id="sup-name" placeholder="Ej. Distribuidora Sur S.A." class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Razón
+                        Social</label>
+                    <input type="text" id="sup-name" placeholder="Ej. Distribuidora Sur S.A."
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Teléfono</label>
-                        <input type="text" id="sup-phone" placeholder="Ej. +54 9..." class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
+                        <label
+                            class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Teléfono</label>
+                        <input type="text" id="sup-phone" placeholder="Ej. +54 9..."
+                            class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Email</label>
-                        <input type="email" id="sup-email" placeholder="ventas@.." class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
+                        <label
+                            class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Email</label>
+                        <input type="email" id="sup-email" placeholder="ventas@.."
+                            class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Documento / CUIT</label>
-                    <input type="text" id="sup-document" placeholder="Opcional" class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Documento /
+                        CUIT</label>
+                    <input type="text" id="sup-document" placeholder="Opcional"
+                        class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 placeholder-stone-400 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all">
                 </div>
                 <div class="flex gap-3 mt-8 pt-2">
-                    <button type="button" onclick="window.closeModal()" class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
-                    <button type="submit" class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar Dato</button>
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar
+                        Dato</button>
                 </div>
             </form>
         </div>
 
         <!-- Modal: Nuevo Gasto -->
-        <div id="modal-expense" class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
+        <div id="modal-expense"
+            class="modal-content hidden relative bg-white w-full max-w-md mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 sm:p-10">
             <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
+                </svg>
             </div>
             <h3 class="text-2xl font-bold text-stone-900 tracking-tight">Registrar Gasto</h3>
             <p class="text-stone-500 text-sm mt-1 mb-6">Asienta una compra a proveedor o un gasto operativo fijo.</p>
-            
+
             <form id="form-expense" class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Proveedor</label>
-                    <select id="exp-supplier_id" class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer">
+                    <label
+                        class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Proveedor</label>
+                    <select id="exp-supplier_id"
+                        class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer">
                         <option value="">(Sin proveedor / Gasto genérico)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Descripción (Obligatorio)</label>
-                    <input type="text" id="exp-desc" placeholder="Ej: Pago de mercadería / Luz" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Descripción
+                        (Obligatorio)</label>
+                    <input type="text" id="exp-desc" placeholder="Ej: Pago de mercadería / Luz"
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Monto ($)</label>
-                        <input type="number" id="exp-amount" step="0.01" placeholder="0.00" class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Monto
+                            ($)</label>
+                        <input type="number" id="exp-amount" step="0.01" placeholder="0.00"
+                            class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Categoría</label>
-                        <select id="exp-cat" class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer" required>
-                            <option value="proveedores">Proveedores</option>
-                            <option value="fijos">Costos Fijos</option>
-                            <option value="otros">Otros</option>
-                        </select>
+                        <label
+                            class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Categoría</label>
+                        <input type="text" id="exp-cat" placeholder="Operativo, Fijo..."
+                            class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Método de Pago</label>
-                    <select id="exp-payment" class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 focus:border-stone-400 outline-none transition-all cursor-pointer" required>
-                        <option value="efectivo">Efectivo 💵</option>
-                        <option value="tarjeta">Tarjeta 💳</option>
-                        <option value="transferencia">Transferencia 🏦</option>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Método de
+                        Pago</label>
+                    <select id="exp-payment"
+                        class="w-full p-4 bg-stone-50/50 border border-stone-200 rounded-2xl text-stone-800 focus:bg-white focus:ring-2 focus:ring-stone-400 transition-all cursor-pointer">
+                        <option value="efectivo">Efectivo</option>
+                        <option value="transferencia">Transferencia</option>
+                        <option value="tarjeta">Tarjeta</option>
                     </select>
                 </div>
                 <div class="flex gap-3 mt-8 pt-2">
-                    <button type="button" onclick="window.closeModal()" class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
-                    <button type="submit" class="btn-ripple flex-1 px-5 py-3.5 bg-amber-500 font-semibold text-white rounded-2xl shadow hover:bg-amber-600 transition-colors">Guardar Gasto</button>
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar
+                        Gasto</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal: Saldar Deuda -->
+        <div id="modal-debt-settle"
+            class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8">
+            <h3 class="text-xl font-bold text-center text-stone-900 tracking-tight mb-2">Saldar Deuda</h3>
+            <p class="text-stone-500 text-sm text-center mb-6">Registra el pago del cliente <span
+                    id="debt-settle-client" class="font-bold"></span> por un total de <span id="debt-settle-amount"
+                    class="font-bold text-emerald-600"></span>.</p>
+            <form id="form-settle-debt" class="space-y-4">
+                <input type="hidden" id="debt-settle-id">
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Método de
+                        Pago Final</label>
+                    <select id="debt-settle-method"
+                        class="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all cursor-pointer">
+                        <option value="efectivo">💵 Efectivo</option>
+                        <option value="tarjeta">💳 Tarjeta / MercadoPago</option>
+                        <option value="transferencia">🏦 Transferencia Bancaria</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-4 py-3 text-stone-600 font-semibold bg-stone-100 hover:bg-stone-200 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-4 py-3 bg-emerald-500 font-semibold text-white rounded-2xl shadow hover:bg-emerald-600 transition-colors">Confirmar
+                        Pago</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal: Crear Revendedor -->
+        <div id="modal-reseller"
+            class="modal-content hidden relative bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl border border-stone-100 overflow-hidden transform scale-95 transition-transform duration-300 p-8 pt-10">
+            <h3 class="text-2xl font-bold text-stone-900 tracking-tight mb-1" id="reseller-modal-title">Añadir
+                Revendedor</h3>
+            <p class="text-stone-500 text-sm mb-6">Registra una persona autorizada para vender tu stock.</p>
+            <form id="form-reseller" class="space-y-4">
+                <input type="hidden" id="reseller-id">
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Nombre
+                        Completo</label>
+                    <input type="text" id="reseller-name" placeholder="Ej. Juan Pérez"
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400" required>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Teléfono de
+                        Contacto</label>
+                    <input type="text" id="reseller-phone" placeholder="Opcional"
+                        class="input-fancy w-full p-4 rounded-2xl text-stone-800 placeholder-stone-400">
+                </div>
+                <div class="flex gap-3 mt-8 pt-2">
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold hover:bg-stone-50 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-stone-900 font-semibold text-white rounded-2xl shadow hover:bg-stone-800 transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal: Asignar Stock a Revendedor -->
+        <div id="modal-assign-stock"
+            class="modal-content hidden relative bg-stone-50 w-full max-w-md mx-4 rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="p-6 sm:p-8 pb-4 shrink-0 bg-white">
+                <h3 class="text-xl font-bold text-stone-900 tracking-tight mb-1">Entregar Stock</h3>
+                <p class="text-stone-500 text-sm">Asigna mercadería a <span id="assign-stock-reseller-name"
+                        class="font-bold text-stone-800"></span>.</p>
+            </div>
+
+            <form id="form-assign-stock" class="flex flex-col overflow-hidden h-full">
+                <input type="hidden" id="assign-reseller-id">
+
+                <div class="flex-1 overflow-y-auto p-6 sm:p-8 pt-2 space-y-4">
+                    <div class="sticky top-0 bg-stone-50 pb-2 z-10 pt-2">
+                        <div class="flex flex-col gap-2">
+                            <select id="assign-product-select"
+                                class="w-full p-3.5 bg-white border border-stone-200 rounded-2xl text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all shadow-sm">
+                                <option value="">Selecciona producto...</option>
+                            </select>
+                            <div class="flex gap-2">
+                                <input type="number" id="assign-qty" placeholder="Cant." min="1"
+                                    class="w-24 p-3.5 bg-white border border-stone-200 rounded-2xl text-center text-stone-700 shadow-sm">
+                                <button type="button" id="btn-assign-add"
+                                    class="flex-1 bg-stone-800 text-white rounded-2xl font-medium hover:bg-stone-900 transition-colors shadow-sm">Agregar
+                                    a Lista</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-3">Lista a entregar:
+                        </h4>
+                        <ul id="assign-list" class="space-y-2">
+                            <li
+                                class="text-sm text-stone-400 text-center py-4 bg-white/50 rounded-xl border border-stone-100/50">
+                                La lista está vacía</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="shrink-0 p-6 sm:p-8 pt-4 bg-white border-t border-stone-100 flex gap-3">
+                    <button type="button" onclick="window.closeModal()"
+                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold bg-stone-50 hover:bg-stone-100 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="submit"
+                        class="btn-ripple flex-1 px-5 py-3.5 bg-emerald-600 font-bold text-white rounded-2xl shadow hover:bg-emerald-700 transition-colors">Confirmar
+                        Entrega</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal: Rendir Stock de Revendedor -->
+        <div id="modal-settle-stock"
+            class="modal-content hidden relative bg-stone-50 w-full max-w-lg mx-4 rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="p-6 sm:p-8 pb-4 shrink-0 bg-white">
+                <h3 class="text-xl font-bold text-stone-900 tracking-tight mb-1">Rendir Mercadería</h3>
+                <p class="text-stone-500 text-sm">Contabiliza lo vendido y devuelto por <span
+                        id="settle-stock-reseller-name" class="font-bold text-stone-800"></span>.</p>
+            </div>
+
+            <form id="form-settle-stock" class="flex flex-col overflow-hidden h-full">
+                <input type="hidden" id="settle-reseller-id">
+
+                <div class="flex-1 overflow-y-auto p-6 sm:p-8 pt-2">
+                    <div
+                        class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl mb-6 text-sm text-indigo-800 leading-relaxed">
+                        <strong>Instrucciones:</strong> Por cada producto que el vendedor tenía, anota cuánto
+                        <strong>Vendió</strong> y cuánto te <strong>Devolvió</strong> a tu local.
+                    </div>
+                    <ul id="settle-stock-list" class="space-y-4">
+                        <li class="text-center text-stone-400 p-4">Cargando stock en poder del vendedor...</li>
+                    </ul>
+                </div>
+
+                <div
+                    class="shrink-0 p-6 sm:p-8 bg-white border-t border-stone-100 space-y-4 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)] z-20">
+                    <div class="flex justify-between items-center bg-stone-50 p-4 rounded-2xl">
+                        <span class="text-stone-600 font-medium">Monto a cobrar:</span>
+                        <span class="text-2xl font-black text-emerald-600" id="settle-total-calc">$0.00</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="window.closeModal()"
+                            class="flex-1 px-4 py-3.5 text-stone-500 font-semibold bg-stone-100 hover:bg-stone-200 rounded-2xl transition-colors">Pausar/Cancelar</button>
+                        <button type="submit"
+                            class="btn-ripple flex-1 px-4 py-3.5 bg-emerald-600 font-bold text-white rounded-2xl shadow hover:bg-emerald-700 transition-colors">Generar
+                            Venta y Cobrar</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -830,4 +1411,5 @@
     <!-- Lógica de la aplicación -->
     <script type="module" src="./src/app.js"></script>
 </body>
+
 </html>

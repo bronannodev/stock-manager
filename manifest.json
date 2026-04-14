@@ -1,6 +1,6 @@
 {
-    "name": "Tienda Alem POS",
-    "short_name": "Tienda Alem",
+    "name": "Tienda Colores POS",
+    "short_name": "Tienda Colores",
     "description": "Sistema de gestión de inventario y caja",
     "start_url": "./index.html",
     "display": "standalone",

@@ -4,7 +4,7 @@ const loginForm = document.getElementById('login-form');
 const errorDiv = document.getElementById('login-error');
 const submitBtn = document.getElementById('btn-submit');
 
-// 1. Si ya está logueado, redirigir al dashboard inmediatamente
+// 1. Si ya está logueado, redirigir al dashboard 
 async function init() {
     const session = await checkSession();
     if (session) {

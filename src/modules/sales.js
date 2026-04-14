@@ -1,17 +1,48 @@
 import { supabase } from '../config/supabase.js';
 
-export async function processSale(paymentMethod, cartItems) {
+export async function processSale(paymentMethod, cartItems, status = 'paid', clientName = null) {
     // cartItems debe ser un array de objetos: { product_id, quantity, unit_price }
     const { data, error } = await supabase.rpc('register_sale', {
         p_payment_method: paymentMethod,
-        p_items: cartItems
+        p_items: cartItems,
+        p_status: status,
+        p_client_name: clientName
     });
 
     if (error) throw error;
     return data; // Devuelve el UUID de la venta
 }
 
+export async function getDebtors() {
+    const { data, error } = await supabase
+        .from('sales')
+        .select(`
+            id, total_amount, payment_method, created_at, client_name,
+            sale_items ( quantity, product_id, unit_price, products(name) )
+        `)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+}
+
+export async function payDebt(saleId, paymentMethod) {
+    // Solo marca la deuda como pagada y documenta cómo pagó finalmente
+    const { error } = await supabase
+        .from('sales')
+        .update({ 
+            status: 'paid', 
+            payment_method: paymentMethod 
+        })
+        .eq('id', saleId);
+    
+    if (error) throw error;
+    return true;
+}
+
 export async function getDashboardStats() {
+
     // 1. Ingresos (Bruto)
     const { data: sales, error: salesError } = await supabase.from('sales').select('total_amount');
     if (salesError) throw salesError;

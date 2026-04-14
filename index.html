@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Tienda Alem</title>
+    <title>Login - Tienda Colores</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#059669">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,9 +12,10 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F9F6F0; /* Color crema principal */
+            background-color: #F9F6F0;
+            /* Color crema principal */
         }
-        
+
         /* Animaciones personalizadas */
         .animate-fade-slide {
             animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -22,8 +24,15 @@
         }
 
         @keyframes fadeSlideUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Spinner de carga */
@@ -38,8 +47,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Efecto de resplandor sutil de fondo */
@@ -47,7 +61,7 @@
             position: absolute;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(231,223,208,0.8) 0%, rgba(249,246,240,0) 70%);
+            background: radial-gradient(circle, rgba(231, 223, 208, 0.8) 0%, rgba(249, 246, 240, 0) 70%);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -59,13 +73,32 @@
 
         /* Shake en error de login */
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-8px);
+            }
+
+            40% {
+                transform: translateX(8px);
+            }
+
+            60% {
+                transform: translateX(-5px);
+            }
+
+            80% {
+                transform: translateX(5px);
+            }
         }
-        .shake { animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+        .shake {
+            animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
 
         /* Input con focus animado */
         .input-fancy {
@@ -73,6 +106,7 @@
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
             background: #fafaf9 !important;
         }
+
         .input-fancy:focus {
             border-color: #292524 !important;
             background: white !important;
@@ -86,23 +120,28 @@
             position: relative;
             overflow: hidden;
         }
+
         .btn-ripple::after {
             content: '';
             position: absolute;
             border-radius: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.3);
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
             transform: translate(-50%, -50%);
             transition: width 0.5s ease, height 0.5s ease, opacity 0.5s ease;
             opacity: 0;
         }
+
         .btn-ripple:active::after {
-            width: 400px; height: 400px;
+            width: 400px;
+            height: 400px;
             opacity: 1;
             transition: 0s;
         }
     </style>
 </head>
+
 <body class="h-screen w-full flex items-center justify-center relative overflow-hidden text-stone-800">
 
     <!-- Resplandor decorativo de fondo -->
@@ -110,10 +149,12 @@
 
     <!-- Contenedor Principal (Tarjeta) -->
     <div class="w-full max-w-md px-4 sm:px-6 animate-fade-slide">
-        <div class="bg-white p-6 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 relative overflow-hidden">
-            
+        <div
+            class="bg-white p-6 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-stone-100 relative overflow-hidden">
+
             <!-- Detalle decorativo superior -->
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-300 via-stone-400 to-stone-300"></div>
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-300 via-stone-400 to-stone-300">
+            </div>
 
             <!-- Cabecera -->
             <div class="text-center mb-10 mt-2">
@@ -125,11 +166,14 @@
             <form id="login-form" class="space-y-6">
                 <!-- Input Email -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Correo Electrónico</label>
+                    <label for="email"
+                        class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Correo
+                        Electrónico</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                             </svg>
                         </div>
                         <input type="email" id="email" required placeholder="Email"
@@ -139,11 +183,13 @@
 
                 <!-- Input Password -->
                 <div class="space-y-2">
-                    <label for="password" class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Contraseña</label>
+                    <label for="password"
+                        class="block text-xs font-semibold text-stone-500 uppercase tracking-wider ml-1">Contraseña</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
                         <input type="password" id="password" required placeholder="••••••••"
@@ -152,18 +198,19 @@
                 </div>
 
                 <!-- Mensaje de Error (Oculto por defecto) -->
-                <div id="error-message" class="hidden bg-red-50 text-red-600 text-sm py-3 px-4 rounded-xl text-center border border-red-100">
+                <div id="error-message"
+                    class="hidden bg-red-50 text-red-600 text-sm py-3 px-4 rounded-xl text-center border border-red-100">
                     Credenciales incorrectas. Intenta de nuevo.
                 </div>
 
                 <!-- Botón Submit -->
-                <button type="submit" id="submit-btn" 
+                <button type="submit" id="submit-btn"
                     class="btn-ripple w-full bg-stone-800 text-white font-medium py-3.5 rounded-2xl shadow-lg shadow-stone-800/20 hover:bg-stone-900 hover:shadow-xl hover:shadow-stone-900/30 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-stone-200 active:translate-y-0 active:shadow-md transition-all duration-300 flex items-center justify-center gap-2">
                     <span id="btn-text">Ingresar al sistema</span>
                     <div id="btn-spinner" class="spinner"></div>
                 </button>
             </form>
-            
+
             <div class="mt-8 text-center">
                 <p class="text-xs text-stone-400">por @bronannodev</p>
             </div>
@@ -182,8 +229,8 @@
         const errorMessage = document.getElementById('error-message');
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            
+            e.preventDefault();
+
             // Limpiar errores previos y mostrar estado de carga
             errorMessage.classList.add('hidden');
             btn.disabled = true;
@@ -197,25 +244,25 @@
             try {
                 // 2. Ejecutamos la autenticación real en Supabase
                 await login(email, password);
-                
+
                 // 3. Éxito: Mostrar animación y redirigir
                 btnText.textContent = '¡Conectado!';
                 btn.classList.replace('bg-stone-800', 'bg-green-600');
                 btn.classList.replace('hover:bg-stone-900', 'hover:bg-green-700');
                 btn.classList.replace('shadow-stone-800/20', 'shadow-green-600/30');
                 spinner.style.display = 'none';
-                
+
                 setTimeout(() => {
                     window.location.href = 'dashboard.html'; // Redirige al sistema
                 }, 500);
 
             } catch (error) {
                 // 4. Error: Mostrar mensaje exacto de Supabase y restaurar botón
-                
+
                 // Aquí usamos error.message para ver la respuesta real de Supabase
                 errorMessage.textContent = error.message || 'Credenciales incorrectas. Intenta de nuevo.';
                 errorMessage.classList.remove('hidden');
-                
+
                 // Animación de shake en error
                 form.classList.remove('shake');
                 void form.offsetWidth; // Forzar reflow para reiniciar animación
@@ -230,4 +277,5 @@
         });
     </script>
 </body>
+
 </html>

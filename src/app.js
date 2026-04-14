@@ -12,8 +12,8 @@ import { getProducts, createProduct, updateProduct, deleteProduct } from './modu
 import { getExpenses, createExpense, deleteExpense } from './modules/expenses.js';
 import { getCategories, createCategory, updateCategory, deleteCategory } from './modules/categories.js';
 import { getSuppliers, createSupplier } from './modules/suppliers.js';
-import { processSale, getDashboardStats, getAdvancedStats, getSalesHistory, revertSale } from './modules/sales.js';
-
+import { processSale, getDashboardStats, getAdvancedStats, getSalesHistory, revertSale, getDebtors, payDebt } from './modules/sales.js';
+import { getResellers, createReseller, getResellerStock, assignStock, settleStock } from './modules/resellers.js';
 const ui = {
     loadingOverlay: document.getElementById('loading-overlay'),
     userEmail: document.getElementById('user-email'),
@@ -29,7 +29,11 @@ const ui = {
     mobileOverlay: document.getElementById('mobile-overlay')
 };
 
-let state = { products: [], cart: [], expenses: [], suppliers: [], categories: [], salesHistory: [], currentSalesFilter: 'week' };
+window.formatMoney = (amount) => {
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(Number(amount) || 0);
+};
+
+let state = { products: [], cart: [], expenses: [], suppliers: [], categories: [], salesHistory: [], currentSalesFilter: 'week', debtors: [], resellers: [], assignCart: [], currentResellerId: null, settleCart: [] };
 
 // --- COMPONENTES GLOBALES (Toasts & Modales) ---
 window.showToast = (message, type = 'success') => {
@@ -37,24 +41,24 @@ window.showToast = (message, type = 'success') => {
     if (!container) return;
 
     const toast = document.createElement('div');
-    
+
     const styles = {
         success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-        error:   'bg-red-50 border-red-200 text-red-800',
+        error: 'bg-red-50 border-red-200 text-red-800',
         warning: 'bg-amber-50 border-amber-200 text-amber-800',
     };
     const icons = {
         success: `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`,
-        error:   `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        error: `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
         warning: `<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
     };
     const colorClass = styles[type] || styles.success;
     const icon = icons[type] || icons.success;
-    
+
     toast.className = `toast-in flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-lg border text-sm font-medium pointer-events-auto ${colorClass}`;
     toast.innerHTML = `${icon}<span>${message}</span>`;
     container.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.classList.replace('toast-in', 'toast-out');
         setTimeout(() => toast.remove(), 350);
@@ -65,17 +69,17 @@ window.openModal = (modalId) => {
     const overlay = document.getElementById('global-modal');
     const modal = document.getElementById(modalId);
     if (!overlay || !modal) return;
-    
+
     document.querySelectorAll('.modal-content').forEach(m => m.classList.add('hidden'));
-    
+
     overlay.classList.remove('hidden');
     modal.classList.remove('hidden');
-    
+
     // Spring animation
     modal.classList.remove('modal-spring-in');
     void modal.offsetWidth; // Reflow para reiniciar
     modal.classList.add('modal-spring-in');
-    
+
     setTimeout(() => {
         overlay.classList.remove('opacity-0', 'pointer-events-none');
         modal.classList.remove('scale-95');
@@ -85,10 +89,10 @@ window.openModal = (modalId) => {
 window.closeModal = () => {
     const overlay = document.getElementById('global-modal');
     if (!overlay) return;
-    
+
     overlay.classList.add('opacity-0', 'pointer-events-none');
     document.querySelectorAll('.modal-content').forEach(m => m.classList.add('scale-95'));
-    
+
     setTimeout(() => {
         overlay.classList.add('hidden');
         document.querySelectorAll('.modal-content').forEach(m => m.classList.add('hidden'));
@@ -102,11 +106,11 @@ window.closeConfirmModal = () => {
 window.showConfirm = (title, message, callback) => {
     document.getElementById('confirm-title').textContent = title;
     document.getElementById('confirm-desc').textContent = message;
-    
+
     const btn = document.getElementById('btn-confirm-action');
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
-    
+
     newBtn.addEventListener('click', async () => {
         newBtn.disabled = true;
         newBtn.innerHTML = 'Procesando...';
@@ -122,7 +126,7 @@ window.showConfirm = (title, message, callback) => {
 // 1. Guardián de Autenticación
 async function init() {
     const session = await checkSession();
-    
+
     if (!session) {
         // Si no hay sesión, expulsar al login
         window.location.href = 'index.html';
@@ -132,12 +136,14 @@ async function init() {
     // Inicializar UI si está autorizado
     ui.userEmail.textContent = session.user.email;
     ui.loadingOverlay.style.display = 'none'; // Quitar pantalla de carga
-    
+
     bindEvents();
     loadProducts();
     loadSuppliers();
     loadCategories();
     loadExpenses();
+    loadDebtors();
+    loadResellers();
 }
 
 // 2. Asignar Eventos
@@ -148,16 +154,42 @@ function bindEvents() {
     });
 
     ui.navBtns.forEach(btn => btn.addEventListener('click', (e) => switchTab(e.currentTarget.dataset.target)));
-    
+
     document.getElementById('form-product').addEventListener('submit', handleCreateProduct);
     document.getElementById('form-expense').addEventListener('submit', handleCreateExpense);
     document.getElementById('form-supplier').addEventListener('submit', handleCreateSupplier);
     document.getElementById('form-category').addEventListener('submit', handleCreateCategory);
     document.getElementById('form-stock').addEventListener('submit', handleAddStock);
-    
+
     document.getElementById('btn-add-to-cart').addEventListener('click', addToCart);
     ui.btnConfirmSale.addEventListener('click', handleCheckout);
     document.getElementById('btn-refresh-dash').addEventListener('click', loadDashboard);
+
+    // Deudores
+    const isPendingCb = document.getElementById('sale-is-pending');
+    const clientCont = document.getElementById('sale-client-name-container');
+    if (isPendingCb) {
+        isPendingCb.addEventListener('change', (e) => {
+            if (e.target.checked) clientCont.classList.remove('hidden');
+            else clientCont.classList.add('hidden');
+        });
+    }
+    const formSettleDebt = document.getElementById('form-settle-debt');
+    if (formSettleDebt) formSettleDebt.addEventListener('submit', handleSettleDebt);
+
+    // Vendedores
+    const formReseller = document.getElementById('form-reseller');
+    if (formReseller) formReseller.addEventListener('submit', handleCreateReseller);
+
+    const formAssignStock = document.getElementById('form-assign-stock');
+    if (formAssignStock) formAssignStock.addEventListener('submit', handleAssignStock);
+
+    const formSettleStock = document.getElementById('form-settle-stock');
+    if (formSettleStock) formSettleStock.addEventListener('submit', handleSettleStock);
+
+    const btnAssignAdd = document.getElementById('btn-assign-add');
+    if (btnAssignAdd) btnAssignAdd.addEventListener('click', uiAssignAddToList);
+
 
     if (ui.mobileMenuBtn) {
         ui.mobileMenuBtn.addEventListener('click', toggleMobileMenu);
@@ -195,7 +227,7 @@ function switchTab(targetId) {
     // Reactivar animación de entrada
     void activeSection.offsetWidth;
     activeSection.classList.add('section-enter');
-    
+
     // Nav active indicator
     ui.navBtns.forEach(btn => {
         btn.classList.remove('nav-active', 'bg-stone-800', 'text-white');
@@ -231,7 +263,7 @@ async function loadProducts() {
 function renderProductsTable() {
     const tableBody = document.getElementById('products-table-body');
     const cardsBody = document.getElementById('products-cards-body');
-    
+
     if (!tableBody || !cardsBody) return;
 
     if (state.products.length === 0) {
@@ -244,13 +276,13 @@ function renderProductsTable() {
         const isLowStock = p.stock < 5;
         const stockEl = isLowStock
             ? `<span class="badge-stock-critical text-red-600 font-bold text-sm">${p.stock}</span>`
-            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${ p.stock < 15 ? 'bg-amber-50 text-amber-700' : 'bg-stone-100 text-stone-600' }">${p.stock}</span>`;
+            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${p.stock < 15 ? 'bg-amber-50 text-amber-700' : 'bg-stone-100 text-stone-600'}">${p.stock}</span>`;
         return `
         <tr class="table-row-anim border-b border-stone-50">
             <td class="p-4 font-medium">${p.name}</td>
             <td class="p-4 capitalize text-stone-500 text-sm">${p.category || '-'}</td>
-            <td class="p-4"><span class="bg-amber-50 text-amber-600 font-bold px-2 py-1 rounded-lg text-sm">$${p.cost}</span></td>
-            <td class="p-4"><span class="bg-emerald-50 text-emerald-600 font-bold px-2 py-1 rounded-lg text-sm drop-shadow-sm">$${p.price}</span></td>
+            <td class="p-4"><span class="bg-amber-50 text-amber-600 font-bold px-2 py-1 rounded-lg text-sm">${window.formatMoney(p.cost)}</span></td>
+            <td class="p-4"><span class="bg-emerald-50 text-emerald-600 font-bold px-2 py-1 rounded-lg text-sm drop-shadow-sm">${window.formatMoney(p.price)}</span></td>
             <td class="p-4">${stockEl}</td>
             <td class="p-4">
                 <div class="flex items-center gap-2 justify-end">
@@ -267,7 +299,7 @@ function renderProductsTable() {
             </td>
         </tr>`;
     }).join('');
-    
+
     // Render Cards (Mobile)
     cardsBody.innerHTML = state.products.map(p => `
         <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100 flex flex-col gap-3">
@@ -282,11 +314,11 @@ function renderProductsTable() {
             <div class="flex items-center gap-4 py-2 border-y border-stone-50">
                 <div>
                     <p class="text-[10px] uppercase font-bold text-stone-400 mb-0.5">Costo</p>
-                    <span class="bg-amber-50 text-amber-600 font-bold px-2 py-0.5 rounded-md text-sm drop-shadow-sm">$${p.cost}</span>
+                    <span class="bg-amber-50 text-amber-600 font-bold px-2 py-0.5 rounded-md text-sm drop-shadow-sm">${window.formatMoney(p.cost)}</span>
                 </div>
                 <div>
                     <p class="text-[10px] uppercase font-bold text-stone-400 mb-0.5">Precio Venta</p>
-                    <span class="bg-emerald-50 text-emerald-600 font-bold px-2 py-0.5 rounded-md text-sm drop-shadow-sm">$${p.price}</span>
+                    <span class="bg-emerald-50 text-emerald-600 font-bold px-2 py-0.5 rounded-md text-sm drop-shadow-sm">${window.formatMoney(p.price)}</span>
                 </div>
             </div>
 
@@ -310,16 +342,16 @@ function renderProductsTable() {
 window.editProduct = (id) => {
     const product = state.products.find(p => p.id === id);
     if (!product) return;
-    
+
     document.getElementById('prod-id').value = product.id;
     document.getElementById('prod-name').value = product.name;
     document.getElementById('prod-cost').value = product.cost;
     document.getElementById('prod-price').value = product.price;
     document.getElementById('prod-category').value = product.category || '';
-    
+
     document.querySelector('#modal-product h3').textContent = 'Editar Producto';
     document.querySelector('#form-product button[type="submit"]').textContent = 'Actualizar Catálogo';
-    
+
     window.openModal('modal-product');
 };
 
@@ -342,7 +374,7 @@ window.deleteProduct = async (id) => {
 
 async function handleCreateProduct(e) {
     e.preventDefault();
-    const btnSubmit = e.target.querySelector('button[type="submit"]');    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
     const id = document.getElementById('prod-id').value;
     const name = document.getElementById('prod-name').value;
     const cost = parseFloat(document.getElementById('prod-cost').value);
@@ -352,7 +384,7 @@ async function handleCreateProduct(e) {
     try {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = 'Guardando...';
-        
+
         if (id) {
             await updateProduct(id, { name, cost, price, category });
             window.showToast('Producto actualizado', 'success');
@@ -360,13 +392,13 @@ async function handleCreateProduct(e) {
             await createProduct({ name, cost, price, category, stock: 0 });
             window.showToast('Producto añadido', 'success');
         }
-        
+
         window.closeModal();
         e.target.reset();
         document.getElementById('prod-id').value = '';
         document.querySelector('#modal-product h3').textContent = 'Añadir Producto';
         document.querySelector('#form-product button[type="submit"]').textContent = 'Guardar Producto';
-        
+
         await loadProducts();
     } catch (error) {
         window.showToast('Error al guardar el producto', 'error');
@@ -381,17 +413,17 @@ async function handleCreateProduct(e) {
 window.openStockModal = (id) => {
     const product = state.products.find(p => p.id === id);
     if (!product) return;
-    
+
     document.getElementById('stock-prod-id').value = product.id;
     document.getElementById('label-stock-prod').textContent = product.name;
     document.getElementById('stock-qty').value = '';
-    
+
     window.openModal('modal-stock');
 };
 
 async function handleAddStock(e) {
     e.preventDefault();
-    const btnSubmit = e.target.querySelector('button[type="submit"]');    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
     const id = document.getElementById('stock-prod-id').value;
     const qty = parseInt(document.getElementById('stock-qty').value);
 
@@ -403,11 +435,11 @@ async function handleAddStock(e) {
     try {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = 'Sumando...';
-        
+
         await updateProduct(id, { stock: product.stock + qty });
         window.closeModal();
         window.showToast(`Stock actualizado exitosamente (+${qty})`, 'success');
-        
+
         await loadProducts();
     } catch (error) {
         window.showToast('Error al sumar stock', 'error');
@@ -465,13 +497,13 @@ function renderSuppliersTable() {
 function renderSupplierSelect() {
     const select = document.getElementById('exp-supplier_id');
     if (!select) return;
-    select.innerHTML = '<option value="">(Sin proveedor / Gasto genérico)</option>' + 
+    select.innerHTML = '<option value="">(Sin proveedor / Gasto genérico)</option>' +
         state.suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 async function handleCreateSupplier(e) {
     e.preventDefault();
-    const btnSubmit = e.target.querySelector('button[type="submit"]');    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
     const name = document.getElementById('sup-name').value;
     const phone = document.getElementById('sup-phone').value;
     const email = document.getElementById('sup-email').value;
@@ -510,11 +542,11 @@ async function loadCategories() {
 function renderCategorySelect() {
     const select = document.getElementById('prod-category');
     if (!select) return;
-    
+
     const currentValue = select.value;
-    select.innerHTML = '<option value="">Sin Categoría</option>' + 
+    select.innerHTML = '<option value="">Sin Categoría</option>' +
         state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-    
+
     if (state.categories.some(c => c.name === currentValue)) {
         select.value = currentValue;
     }
@@ -571,7 +603,7 @@ window.openCategoryModal = () => {
     document.getElementById('cat-id').value = '';
     document.getElementById('cat-name').value = '';
     document.getElementById('cat-modal-title').textContent = 'Añadir Categoría';
-    
+
     // Si estabamos en modal producto, solo lo cerramos y abrimos
     window.openModal('modal-category');
 };
@@ -579,11 +611,11 @@ window.openCategoryModal = () => {
 window.editCategory = (id) => {
     const category = state.categories.find(c => c.id === id);
     if (!category) return;
-    
+
     document.getElementById('cat-id').value = category.id;
     document.getElementById('cat-name').value = category.name;
     document.getElementById('cat-modal-title').textContent = 'Editar Categoría';
-    
+
     window.openModal('modal-category');
 };
 
@@ -606,14 +638,14 @@ window.deleteCategory = async (id) => {
 
 async function handleCreateCategory(e) {
     e.preventDefault();
-    const btnSubmit = e.target.querySelector('button[type="submit"]');    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
     const id = document.getElementById('cat-id').value;
     const name = document.getElementById('cat-name').value;
 
     try {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = 'Guardando...';
-        
+
         if (id) {
             await updateCategory(id, name);
             window.showToast('Categoría actualizada', 'success');
@@ -621,7 +653,7 @@ async function handleCreateCategory(e) {
             await createCategory(name);
             window.showToast('Categoría añadida', 'success');
         }
-        
+
         window.closeModal();
         e.target.reset();
         await loadCategories();
@@ -666,7 +698,7 @@ function renderExpensesTable() {
     const tableBody = document.getElementById('expenses-table-body');
     const cardsBody = document.getElementById('expenses-cards-body');
     if (!tableBody) return;
-    
+
     if (state.expenses.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-stone-400">Aún no registraste gastos...</td></tr>`;
         if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">Sin gastos registrados.</div>`;
@@ -685,7 +717,7 @@ function renderExpensesTable() {
                     ${e.payment_method}
                 </span>
             </td>
-            <td class="p-5 text-right font-bold text-amber-600">$${e.amount}</td>
+            <td class="p-5 text-right font-bold text-amber-600">${window.formatMoney(e.amount)}</td>
             <td class="p-5 text-right w-10">
                 <button onclick="window.deleteExpense('${e.id}')" class="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors" title="Eliminar Gasto">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -702,7 +734,7 @@ function renderExpensesTable() {
                         <p class="font-bold text-stone-900 leading-tight">${e.description}</p>
                         <p class="text-xs text-stone-400 mt-1">${new Date(e.created_at).toLocaleDateString('es-AR')} &bull; <span class="capitalize">${e.category}</span></p>
                     </div>
-                    <p class="text-xl font-black text-amber-600 shrink-0">$${e.amount}</p>
+                    <p class="text-xl font-black text-amber-600 shrink-0">${window.formatMoney(e.amount)}</p>
                 </div>
                 <div class="flex items-center justify-between pt-3 border-t border-stone-50">
                     <span class="inline-flex items-center gap-1.5 text-xs font-medium text-stone-500 bg-stone-100 px-3 py-1.5 rounded-full">
@@ -719,7 +751,7 @@ function renderExpensesTable() {
 
 async function handleCreateExpense(e) {
     e.preventDefault();
-    const btnSubmit = e.target.querySelector('button[type="submit"]');    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
     const description = document.getElementById('exp-desc').value;
     const amount = parseFloat(document.getElementById('exp-amount').value);
     const category = document.getElementById('exp-cat').value;
@@ -745,18 +777,18 @@ async function handleCreateExpense(e) {
 
 // 5. Lógica de Ventas
 function renderProductSelect() {
-    ui.saleProductSelect.innerHTML = '<option value="">Selecciona un producto...</option>' + 
+    ui.saleProductSelect.innerHTML = '<option value="">Selecciona un producto...</option>' +
         state.products
-            .map(p => `<option value="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}>${p.name} - $${p.price} (Stock: ${p.stock})</option>`)
+            .map(p => `<option value="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}>${p.name} - ${window.formatMoney(p.price)} (Stock: ${p.stock})</option>`)
             .join('');
 }
 
 function addToCart() {
     const prodId = ui.saleProductSelect.value;
     const qty = parseInt(document.getElementById('sale-qty').value);
-    
+
     if (!prodId) return showToast('Selecciona un producto', 'error');
-    
+
     const product = state.products.find(p => p.id === prodId);
     if (!product || qty <= 0) return;
     if (qty > product.stock) return showToast('Stock insuficiente', 'error');
@@ -795,8 +827,8 @@ function renderCart() {
             <tr class="table-row-anim border-b border-stone-50">
                 <td class="p-4 font-medium">${item.name}</td>
                 <td class="p-4 text-center">${item.quantity}</td>
-                <td class="p-4 text-right text-stone-500">$${item.unit_price}</td>
-                <td class="p-4 text-right font-bold">$${(item.quantity * item.unit_price).toFixed(2)}</td>
+                <td class="p-4 text-right text-stone-500">${window.formatMoney(item.unit_price)}</td>
+                <td class="p-4 text-right font-bold">${window.formatMoney(item.quantity * item.unit_price)}</td>
                 <td class="p-4 text-right">
                     <button onclick="window.removeFromCart(${index})" class="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -812,9 +844,9 @@ function renderCart() {
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center gap-3">
                 <div class="flex-1">
                     <p class="font-bold text-stone-900">${item.name}</p>
-                    <p class="text-sm text-stone-500 mt-0.5">${item.quantity} u. &times; $${item.unit_price}</p>
+                    <p class="text-sm text-stone-500 mt-0.5">${item.quantity} u. &times; ${window.formatMoney(item.unit_price)}</p>
                 </div>
-                <p class="font-black text-stone-900 text-lg">$${(item.quantity * item.unit_price).toFixed(2)}</p>
+                <p class="font-black text-stone-900 text-lg">${window.formatMoney(item.quantity * item.unit_price)}</p>
                 <button onclick="window.removeFromCart(${index})" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -822,7 +854,7 @@ function renderCart() {
         `).join('');
     }
 
-    document.getElementById('sale-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('sale-total').textContent = window.formatMoney(total);
 }
 
 window.removeFromCart = (index) => {
@@ -833,7 +865,13 @@ window.removeFromCart = (index) => {
 async function handleCheckout() {
     if (state.cart.length === 0) return showToast('El carrito está vacío', 'error');
     const method = document.getElementById('sale-payment-method').value;
-    
+
+    const isPending = document.getElementById('sale-is-pending').checked;
+    const clientName = document.getElementById('sale-client-name').value;
+    if (isPending && !clientName.trim()) {
+        return showToast('Ingresa el nombre del cliente deudor', 'error');
+    }
+
     const payload = state.cart.map(item => ({
         product_id: item.product_id,
         quantity: item.quantity,
@@ -844,10 +882,18 @@ async function handleCheckout() {
     ui.btnConfirmSale.textContent = 'Procesando...';
 
     try {
-        await processSale(method, payload);
+        await processSale(method, payload, isPending ? 'pending' : 'paid', isPending ? clientName : null);
         showToast('Venta registrada con éxito', 'success');
         state.cart = [];
         renderCart();
+
+        document.getElementById('sale-is-pending').checked = false;
+        document.getElementById('sale-client-name-container').classList.add('hidden');
+        document.getElementById('sale-client-name').value = '';
+
+        await loadProducts();
+        if (isPending) await loadDebtors();
+
         await loadProducts(); // Recargar stock
     } catch (error) {
         console.error(error);
@@ -861,7 +907,7 @@ async function handleCheckout() {
 // 6. Reportes e Historial de Ventas
 window.filterSales = async (filter) => {
     state.currentSalesFilter = filter;
-    
+
     // UI Botones
     const btns = ['today', 'week', 'month', 'all'];
     btns.forEach(b => {
@@ -880,9 +926,9 @@ window.filterSales = async (filter) => {
 async function loadSalesHistory(filter) {
     const tableBody = document.getElementById('sales-history-tbody');
     if (!tableBody) return;
-    
+
     tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-stone-400">Cargando reportes...</td></tr>`;
-    
+
     try {
         state.salesHistory = await getSalesHistory(filter);
         renderSalesHistory();
@@ -896,7 +942,7 @@ function renderSalesHistory() {
     const tableBody = document.getElementById('sales-history-tbody');
     const cardsBody = document.getElementById('sales-history-cards');
     if (!tableBody) return;
-    
+
     if (state.salesHistory.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-stone-400">No hay ventas registradas en este período.</td></tr>`;
         if (cardsBody) cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm">No hay ventas en este período.</div>`;
@@ -906,7 +952,7 @@ function renderSalesHistory() {
     const paymentIcon = { efectivo: '💵', tarjeta: '💳', transferencia: '🏦' };
 
     tableBody.innerHTML = state.salesHistory.map(s => {
-        const details = s.sale_items.map(item => `<span class="inline-block px-2 py-0.5 bg-stone-100 rounded text-xs mr-1 mb-1">${item.quantity}x ${item.products ? item.products.name : 'Desc'} ($${item.unit_price || 0})</span>`).join('');
+        const details = s.sale_items.map(item => `<span class="inline-block px-2 py-0.5 bg-stone-100 rounded text-xs mr-1 mb-1">${item.quantity}x ${item.products ? item.products.name : 'Desc'} (${window.formatMoney(item.unit_price || 0)})</span>`).join('');
         return `
         <tr class="table-row-anim border-b border-stone-50">
             <td class="p-5 text-sm">${new Date(s.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</td>
@@ -916,7 +962,7 @@ function renderSalesHistory() {
                     ${s.payment_method}
                 </span>
             </td>
-            <td class="p-5 text-right font-bold text-stone-800">$${s.total_amount}</td>
+            <td class="p-5 text-right font-bold text-stone-800">${window.formatMoney(s.total_amount)}</td>
             <td class="p-5 w-20 text-right">
                 <div class="flex justify-end">
                     <button onclick="window.deleteSale('${s.id}')" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors" title="Eliminar y devolver Stock">
@@ -938,7 +984,7 @@ function renderSalesHistory() {
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <p class="text-xs text-stone-400 font-medium">${new Date(s.created_at).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}</p>
-                        <p class="font-black text-stone-900 text-2xl tracking-tighter mt-1">$${s.total_amount}</p>
+                        <p class="font-black text-stone-900 text-2xl tracking-tighter mt-1">${window.formatMoney(s.total_amount)}</p>
                     </div>
                     <button onclick="window.deleteSale('${s.id}')" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors mt-1" title="Anular venta">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -975,76 +1021,56 @@ window.deleteSale = async (id) => {
 };
 
 // Helper: contador animado
-function animateCounter(element, targetValue, prefix = '$', duration = 900) {
+function animateCounter(element, targetValue) {
     if (!element) return;
-    element.classList.remove('counter-pop');
-    void element.offsetWidth;
-    element.classList.add('counter-pop');
-    
-    const start = performance.now();
-    const startVal = 0;
-    function update(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const value = startVal + (targetValue - startVal) * eased;
-        element.textContent = prefix + value.toFixed(2);
-        if (progress < 1) requestAnimationFrame(update);
-    }
-    requestAnimationFrame(update);
+    element.textContent = window.formatMoney(targetValue);
 }
 
 // 7. Lógica de Dashboard
 async function loadDashboard() {
     try {
         const stats = await getDashboardStats();
-        
+
         const safeCurrency = (val) => Number(val) || 0;
-        
+
         const salesEl = document.getElementById('dash-sales');
-        const cogsEl = document.getElementById('dash-cogs');
-        const expEl = document.getElementById('dash-expenses');
-        const netEl = document.getElementById('dash-net-profit');
-        
-        animateCounter(salesEl, safeCurrency(stats.totalSales), '$');
-        if (cogsEl) animateCounter(cogsEl, safeCurrency(stats.totalCogs), '-$');
-        if (expEl) animateCounter(expEl, safeCurrency(stats.totalExpenses), '-$');
-        if (netEl) animateCounter(netEl, safeCurrency(stats.netProfit), '$');
-        
+        if (salesEl) salesEl.textContent = window.formatMoney(safeCurrency(stats.totalSales));
+
         // Advanced stats
         const { topSelling } = await getAdvancedStats();
-        
+
         const topSalesList = document.getElementById('dash-top-sales');
         if (topSalesList) {
-            topSalesList.innerHTML = topSelling.length > 0 ? 
-                topSelling.map((t, i) => `
+            const filteredTop = topSelling.filter(t => t.qty > 15);
+            topSalesList.innerHTML = filteredTop.length > 0 ?
+                filteredTop.map((t, i) => `
                     <li class="p-4 flex justify-between items-center gap-4">
                         <div class="flex items-center gap-3">
-                            <span class="w-5 h-5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold flex items-center justify-center">${i+1}</span>
+                            <span class="w-5 h-5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-bold flex items-center justify-center">${i + 1}</span>
                             <span class="font-medium text-stone-800">${t.name}</span>
                         </div>
                         <span class="font-bold text-stone-600 text-sm">${t.qty} u.</span>
                     </li>`).join('') :
-                '<li class="p-6 text-center text-stone-400">Sin datos de ventas...</li>';
+                '<li class="p-6 text-center text-stone-400">Sin productos por encima de 15 ventas.</li>';
         }
 
         const lowStockList = document.getElementById('dash-low-stock');
         if (lowStockList) {
-            const lowStock = [...state.products].sort((a, b) => a.stock - b.stock).slice(0, 5);
+            const lowStock = [...state.products].filter(p => p.stock <= 5).sort((a, b) => a.stock - b.stock).slice(0, 5);
             lowStockList.innerHTML = lowStock.length > 0 ?
                 lowStock.map(p => {
-                    const isCrit = p.stock < 5;
+                    const isCrit = p.stock === 0;
                     return `<li class="p-4 flex justify-between items-center">
                         <span class="font-medium text-stone-700">${p.name}</span>
-                        <span class="${ isCrit ? 'badge-stock-critical text-red-600 font-bold' : 'text-amber-600 font-bold' } text-sm">${p.stock} u.</span>
+                        <span class="${isCrit ? 'badge-stock-critical text-red-600 font-bold' : 'text-amber-600 font-bold'} text-sm">${p.stock} u.</span>
                     </li>`;
                 }).join('') :
-                '<li class="p-6 text-center text-stone-400">Excelente stock...</li>';
+                '<li class="p-6 text-center text-stone-400">Excelente stock, nada por debajo de 5 u.</li>';
         }
 
         const highStockList = document.getElementById('dash-high-stock');
         if (highStockList) {
-            const highStock = [...state.products].sort((a, b) => b.stock - a.stock).slice(0, 5);
+            const highStock = [...state.products].filter(p => p.stock >= 20).sort((a, b) => b.stock - a.stock).slice(0, 5);
             highStockList.innerHTML = highStock.length > 0 ?
                 highStock.map(p => `
                     <li class="p-4 flex justify-between items-center">
@@ -1057,6 +1083,357 @@ async function loadDashboard() {
     } catch (error) {
         console.error(error);
         if (window.showToast) window.showToast('Error cargando métricas', 'error');
+    }
+}
+
+// =========================================================
+// MÓDULO: DEUDORES
+// =========================================================
+async function loadDebtors() {
+    try {
+        state.debtors = await getDebtors();
+        renderDebtors();
+    } catch (error) {
+        console.error(error);
+        showToast('Error cargando deudores', 'error');
+    }
+}
+
+function renderDebtors() {
+    const tableBody = document.getElementById('debtors-table-body');
+    const cardsBody = document.getElementById('debtors-cards-body');
+    if (!tableBody || !cardsBody) return;
+
+    if (state.debtors.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-stone-400">No hay deudas pendientes.</td></tr>`;
+        cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100">No hay deudas pendientes.</div>`;
+        return;
+    }
+
+    const getDetailsHtml = (saleItems) => {
+        if (!saleItems || saleItems.length === 0) return '';
+        return '<ul class="mt-2 text-xs text-stone-500 space-y-1 bg-stone-50 rounded-lg p-3">' +
+            saleItems.map(item => `<li><span class="font-bold">${item.quantity}x</span> ${item.products?.name} a ${window.formatMoney(item.unit_price)}</li>`).join('') +
+            '</ul>';
+    };
+
+    const mapRow = (d) => `
+        <tr class="table-row-anim border-b border-stone-50 align-top">
+            <td class="p-4">
+                <span class="font-bold text-stone-900 block">${d.client_name || 'Desconocido'}</span>
+                ${getDetailsHtml(d.sale_items)}
+            </td>
+            <td class="p-4 text-sm text-stone-500 pt-5">${new Date(d.created_at).toLocaleDateString()}</td>
+            <td class="p-4 text-right font-black text-emerald-600 pt-5">${window.formatMoney(d.total_amount)}</td>
+            <td class="p-4 text-right pt-5">
+                <button onclick="window.openSettleDebtModal('${d.id}')" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 font-medium rounded-xl hover:bg-emerald-100 transition-colors">
+                    Saldar
+                </button>
+            </td>
+        </tr>`;
+
+    const mapCard = (d) => `
+        <div class="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm flex flex-col justify-between">
+            <div class="mb-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-stone-900 leading-tight">${d.client_name || 'Desconocido'}</h3>
+                    <span class="text-xl font-black text-emerald-600">${window.formatMoney(d.total_amount)}</span>
+                </div>
+                <p class="text-xs text-stone-400 mb-3">${new Date(d.created_at).toLocaleDateString()}</p>
+                ${getDetailsHtml(d.sale_items)}
+            </div>
+            <button onclick="window.openSettleDebtModal('${d.id}')" class="w-full mt-auto py-2.5 bg-emerald-50 text-emerald-600 font-bold rounded-xl hover:bg-emerald-100 transition-colors text-sm">
+                Saldar Deuda
+            </button>
+        </div>`;
+
+    tableBody.innerHTML = state.debtors.map(mapRow).join('');
+    cardsBody.innerHTML = state.debtors.map(mapCard).join('');
+}
+
+window.openSettleDebtModal = (id) => {
+    const debt = state.debtors.find(d => d.id === id);
+    if (!debt) return;
+    document.getElementById('debt-settle-id').value = debt.id;
+    document.getElementById('debt-settle-client').textContent = debt.client_name || 'Desconocido';
+    document.getElementById('debt-settle-amount').textContent = window.formatMoney(debt.total_amount);
+    document.getElementById('debt-settle-method').value = 'efectivo';
+    window.openModal('modal-debt-settle');
+};
+
+async function handleSettleDebt(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const id = document.getElementById('debt-settle-id').value;
+    const method = document.getElementById('debt-settle-method').value;
+
+    try {
+        btn.disabled = true; btn.textContent = 'Procesando...';
+        await payDebt(id, method);
+        showToast('Deuda saldada correctamente', 'success');
+        window.closeModal();
+        await loadDebtors();
+        await loadDashboard(); // En caso que sume a estadísticas o queremos recargar
+    } catch (err) {
+        showToast('Error al saldar la deuda', 'error');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Confirmar Pago';
+    }
+}
+
+// =========================================================
+// MÓDULO: VENDEDORES (Consignaciones)
+// =========================================================
+async function loadResellers() {
+    try {
+        state.resellers = await getResellers();
+        renderResellers();
+    } catch (error) {
+        console.error(error);
+        showToast('Error cargando vendedores', 'error');
+    }
+}
+
+function renderResellers() {
+    const container = document.getElementById('resellers-cards-container');
+    if (!container) return;
+
+    if (state.resellers.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100 shadow-sm col-span-full">No tienes revendedores.</div>`;
+        return;
+    }
+
+    container.innerHTML = state.resellers.map(r => `
+        <div class="bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="font-bold text-stone-900 text-xl">${r.name}</h3>
+                <p class="text-sm text-stone-400 mt-1">${r.phone || 'Sin teléfono'}</p>
+                <div class="mt-4 inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-bold">
+                    Stock Asignado: ${r.total_items} u.
+                </div>
+            </div>
+            <div class="flex gap-2 mt-6 border-t border-stone-50 pt-4">
+                <button onclick="window.openAssignStockModal('${r.id}')" class="flex-1 py-2 bg-stone-100 text-stone-700 font-medium rounded-xl hover:bg-stone-200 transition-colors text-sm">
+                    Dar Stock
+                </button>
+                <button onclick="window.openSettleStockModal('${r.id}')" class="flex-1 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-xl hover:bg-emerald-100 transition-colors text-sm">
+                    Rendir
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.openResellerModal = () => {
+    document.getElementById('reseller-id').value = '';
+    document.getElementById('form-reseller').reset();
+    window.openModal('modal-reseller');
+};
+
+async function handleCreateReseller(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const name = document.getElementById('reseller-name').value;
+    const phone = document.getElementById('reseller-phone').value;
+
+    try {
+        btn.disabled = true; btn.textContent = 'Guardando...';
+        await createReseller(name, phone);
+        showToast('Vendedor creado exitosamente', 'success');
+        window.closeModal();
+        await loadResellers();
+    } catch (err) {
+        showToast('Error creando vendedor', 'error');
+    } finally {
+        btn.disabled = false; btn.textContent = 'Guardar';
+    }
+}
+
+// -- Asignar Stock al Vendedor
+window.openAssignStockModal = (id) => {
+    const res = state.resellers.find(r => r.id === id);
+    if (!res) return;
+    state.currentResellerId = id;
+    state.assignCart = [];
+    document.getElementById('assign-stock-reseller-name').textContent = res.name;
+    document.getElementById('assign-qty').value = '';
+
+    const sel = document.getElementById('assign-product-select');
+    sel.innerHTML = '<option value="">Sel. Producto...</option>' +
+        state.products.map(p => `<option value="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}>${p.name} (Stock: ${p.stock})</option>`).join('');
+
+    uiRenderAssignList();
+    window.openModal('modal-assign-stock');
+};
+
+function uiAssignAddToList() {
+    const sel = document.getElementById('assign-product-select');
+    const qtyInput = document.getElementById('assign-qty');
+    const pId = sel.value;
+    const qty = parseInt(qtyInput.value);
+
+    if (!pId || !qty || qty <= 0) return showToast('Selección inválida', 'error');
+    const product = state.products.find(p => p.id === pId);
+    if (!product) return;
+
+    // Check if limits exceeded
+    const currentlyInCart = state.assignCart.find(i => i.product_id === pId)?.quantity || 0;
+    if (currentlyInCart + qty > product.stock) return showToast('Stock de tienda insuficiente', 'error');
+
+    const existing = state.assignCart.find(i => i.product_id === pId);
+    if (existing) existing.quantity += qty;
+    else state.assignCart.push({ product_id: product.id, name: product.name, quantity: qty });
+
+    qtyInput.value = '';
+    sel.value = '';
+    uiRenderAssignList();
+}
+
+window.uiRemoveFromAssignList = (index) => {
+    state.assignCart.splice(index, 1);
+    uiRenderAssignList();
+};
+
+function uiRenderAssignList() {
+    const ul = document.getElementById('assign-list');
+    if (state.assignCart.length === 0) {
+        ul.innerHTML = `<li class="text-sm text-stone-400 text-center py-4 bg-white/50 rounded-xl border border-stone-100/50">La lista está vacía</li>`;
+        return;
+    }
+    ul.innerHTML = state.assignCart.map((i, idx) => `
+        <li class="flex items-center justify-between text-sm py-2 px-3 bg-white rounded-xl border border-stone-100">
+            <span class="font-medium text-stone-800">${i.name}</span>
+            <div class="flex items-center gap-3">
+                <span class="font-bold text-stone-500">${i.quantity} u.</span>
+                <button type="button" onclick="window.uiRemoveFromAssignList(${idx})" class="p-1 text-red-400 hover:text-red-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+        </li>
+    `).join('');
+}
+
+async function handleAssignStock(e) {
+    e.preventDefault();
+    if (state.assignCart.length === 0) return showToast('Agrega productos a la lista primero', 'error');
+    const btn = e.target.querySelector('button[type="submit"]');
+
+    try {
+        btn.disabled = true; btn.textContent = 'Enviando...';
+        // En un caso ideal haríamos Promise.all o un RPC, aquí lo hacemos secuencial para evitar race conditions
+        for (const item of state.assignCart) {
+            await assignStock(state.currentResellerId, item.product_id, item.quantity);
+        }
+        showToast('Mercadería entregada exitosamente', 'success');
+        window.closeModal();
+        await loadProducts();
+        await loadResellers();
+    } catch (err) {
+        showToast('Ocurrió un error al entregar mercadería', 'error');
+        console.error(err);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Confirmar Entrega';
+    }
+}
+
+// -- Rendir Stock del Vendedor
+window.openSettleStockModal = async (id) => {
+    const res = state.resellers.find(r => r.id === id);
+    if (!res) return;
+    state.currentResellerId = id;
+    document.getElementById('settle-stock-reseller-name').textContent = res.name;
+
+    const ul = document.getElementById('settle-stock-list');
+    ul.innerHTML = '<li class="text-center text-stone-400 p-4">Cargando stock en poder del vendedor...</li>';
+    document.getElementById('settle-total-calc').textContent = '$0.00';
+
+    window.openModal('modal-settle-stock');
+
+    try {
+        const theirStock = await getResellerStock(id);
+        if (theirStock.length === 0) {
+            ul.innerHTML = '<li class="text-center text-stone-400 p-4 bg-stone-100 rounded-xl">El vendedor no tiene mercadería.</li>';
+            return;
+        }
+
+        state.settleCart = theirStock.map(ts => ({
+            product_id: ts.product_id,
+            name: ts.products.name,
+            original_price: ts.products.price, // Asumimos precio estándar, si lo vendió diferente no está soportado en input por simplicidad
+            has_assigned: ts.quantity,
+            sold: 0,
+            returned: 0
+        }));
+
+        uiRenderSettleList();
+    } catch (err) {
+        showToast('No se pudo cargar el inventario del vendedor', 'error');
+    }
+};
+
+function uiRenderSettleList() {
+    const ul = document.getElementById('settle-stock-list');
+    ul.innerHTML = state.settleCart.map((s, i) => `
+        <li class="bg-white p-4 rounded-2xl border border-stone-200">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-stone-800">${s.name}</span>
+                <span class="text-xs bg-stone-100 text-stone-500 py-1 px-2.5 rounded-md font-semibold">Tenia: ${s.has_assigned}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1 px-1">Vendió (u.)</label>
+                    <input type="number" min="0" max="${s.has_assigned - s.returned}" value="${s.sold}" oninput="window.uiUpdateSettleVal(${i}, 'sold', this.value)" class="w-full bg-emerald-50/50 border border-emerald-100 p-2.5 rounded-xl text-center text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1 px-1">Devolvió (u.)</label>
+                    <input type="number" min="0" max="${s.has_assigned - s.sold}" value="${s.returned}" oninput="window.uiUpdateSettleVal(${i}, 'returned', this.value)" class="w-full bg-stone-50/50 border border-stone-200 p-2.5 rounded-xl text-center text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all font-bold">
+                </div>
+            </div>
+        </li>
+    `).join('');
+    uiSettleCalculate();
+}
+
+window.uiUpdateSettleVal = (index, field, val) => {
+    let parsed = parseInt(val) || 0;
+    const item = state.settleCart[index];
+
+    // Prevent exceeding total allocated
+    if (field === 'sold') {
+        if (parsed + item.returned > item.has_assigned) parsed = item.has_assigned - item.returned;
+        item.sold = parsed;
+    } else {
+        if (parsed + item.sold > item.has_assigned) parsed = item.has_assigned - item.sold;
+        item.returned = parsed;
+    }
+
+    uiSettleCalculate();
+};
+
+function uiSettleCalculate() {
+    const total = state.settleCart.reduce((sum, item) => sum + (item.sold * item.original_price), 0);
+    document.getElementById('settle-total-calc').textContent = window.formatMoney(total);
+}
+
+async function handleSettleStock(e) {
+    e.preventDefault();
+
+    const hasActions = state.settleCart.some(i => i.sold > 0 || i.returned > 0);
+    if (!hasActions) return showToast('No se registraron ventas ni devoluciones.', 'warning');
+
+    const btn = e.target.querySelector('button[type="submit"]');
+
+    try {
+        btn.disabled = true; btn.textContent = 'Procesando...';
+        await settleStock(state.currentResellerId, state.settleCart);
+        showToast('Rendición exitosa', 'success');
+        window.closeModal();
+        await loadProducts();
+        await loadResellers();
+        await loadDashboard(); // To refetch stats
+    } catch (err) {
+        showToast('Error al rendir la mercadería', 'error');
+        console.error(err);
+    } finally {
+        btn.disabled = false; btn.textContent = 'Generar Venta y Cobrar';
     }
 }
 
