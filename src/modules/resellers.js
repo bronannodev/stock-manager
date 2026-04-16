@@ -160,5 +160,16 @@ export async function settleStock(resellerId, settlementItems) {
         }
     }
     
+    
+    return true;
+}
+
+export async function deleteReseller(id) {
+    const { error } = await supabase
+        .from('resellers')
+        .delete()
+        .eq('id', id);
+        
+    if (error) throw error;
     return true;
 }

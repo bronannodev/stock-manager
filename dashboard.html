@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard - Tienda Alem</title>
+    <title>Dashboard - Tienda Colores</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#059669">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -399,7 +399,7 @@
     <!-- Mobile Header -->
     <header
         class="md:hidden bg-stone-900 text-stone-300 p-4 flex justify-between items-center shadow-md shrink-0 relative z-20">
-        <img src="./src/assets/logo.png" alt="Tienda Alem" class="h-10 object-contain">
+        <img src="./src/assets/logo.png" alt="Tienda Colores" class="h-10 object-contain">
         <button id="mobile-menu-btn"
             class="p-2 text-stone-300 hover:text-white rounded-md focus:outline-none hover:bg-stone-800">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,7 +417,7 @@
     <aside id="sidebar"
         class="w-64 bg-stone-900 text-stone-300 flex flex-col shadow-2xl z-40 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
         <div class="p-4 border-b border-stone-800 flex justify-center items-center h-32 bg-stone-900/50">
-            <img src="./src/assets/logo.png" alt="Tienda Alem" class="h-20 w-auto object-contain">
+            <img src="./src/assets/logo.png" alt="Tienda Colores" class="h-20 w-auto object-contain">
         </div>
         <nav class="flex-1 p-4 space-y-2 mt-4">
             <button data-target="view-products"
@@ -724,7 +724,7 @@
                 </button>
             </div>
 
-            <div class="mb-8 max-w-md">
+            <div class="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <!-- Tarjeta: Ventas Totales -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
                     <div class="flex items-center gap-4 mb-4">
@@ -740,6 +740,40 @@
                         </h3>
                     </div>
                     <p class="text-4xl font-black text-stone-900 tracking-tighter" id="dash-sales">$0.00</p>
+                </div>
+
+                <!-- Tarjeta: Valor Inventario Costo -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Valor Inventario (Costo)
+                        </h3>
+                    </div>
+                    <p class="text-4xl font-black text-amber-600 tracking-tighter" id="dash-inventario-costo">$0.00</p>
+                </div>
+
+                <!-- Tarjeta: Valor Inventario Venta -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex flex-col justify-between">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-stone-500 text-xs font-semibold uppercase tracking-wider">Valor Inventario (Venta)
+                        </h3>
+                    </div>
+                    <p class="text-4xl font-black text-indigo-600 tracking-tighter" id="dash-inventario-venta">$0.00</p>
                 </div>
             </div>
 
@@ -1356,11 +1390,18 @@
                     </div>
                 </div>
 
-                <div class="shrink-0 p-6 sm:p-8 pt-4 bg-white border-t border-stone-100 flex gap-3">
+                <div class="shrink-0 p-6 sm:p-8 pt-4 bg-white border-t border-stone-100 flex gap-3 flex-wrap sm:flex-nowrap">
                     <button type="button" onclick="window.closeModal()"
-                        class="flex-1 px-5 py-3.5 text-stone-500 font-semibold bg-stone-50 hover:bg-stone-100 rounded-2xl transition-colors">Cancelar</button>
+                        class="flex-1 min-w-[100px] px-5 py-3.5 text-stone-500 font-semibold bg-stone-50 hover:bg-stone-100 rounded-2xl transition-colors">Cancelar</button>
+                    <button type="button" onclick="window.generateRemitoPDF()"
+                        class="flex-1 min-w-[100px] px-5 py-3.5 text-indigo-600 font-semibold bg-indigo-50 hover:bg-indigo-100 rounded-2xl transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Remito
+                    </button>
                     <button type="submit"
-                        class="btn-ripple flex-1 px-5 py-3.5 bg-emerald-600 font-bold text-white rounded-2xl shadow hover:bg-emerald-700 transition-colors">Confirmar
+                        class="btn-ripple w-full sm:w-auto flex-[2] px-5 py-3.5 bg-emerald-600 font-bold text-white rounded-2xl shadow hover:bg-emerald-700 transition-colors">Confirmar
                         Entrega</button>
                 </div>
             </form>

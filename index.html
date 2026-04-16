@@ -219,14 +219,23 @@
 
     <!-- Script de lógica de UI conectado a Supabase -->
     <script type="module">
-        // 1. Importamos tu función real de login
-        import { login } from './src/modules/auth.js';
+        // 1. Importamos tu función real de login y validación
+        import { login, checkSession } from './src/modules/auth.js';
 
         const form = document.getElementById('login-form');
         const btn = document.getElementById('submit-btn');
         const btnText = document.getElementById('btn-text');
         const spinner = document.getElementById('btn-spinner');
         const errorMessage = document.getElementById('error-message');
+
+        // Comprobamos si ya existe una sesión en segundo plano al abrir la página
+        checkSession().then(session => {
+            if (session) {
+                // Si ya está logueado, lo mandamos directo al dashboard sin guardarlo en el historial
+                btnText.textContent = 'Sesión activa...';
+                window.location.replace('dashboard.html');
+            }
+        });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -253,7 +262,8 @@
                 spinner.style.display = 'none';
 
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html'; // Redirige al sistema
+                    // Se usa replace() en lugar de href para que Android no registre "Login" en el botón 'Volver atrás'
+                    window.location.replace('dashboard.html');
                 }, 500);
 
             } catch (error) {

@@ -13,7 +13,7 @@ import { getExpenses, createExpense, deleteExpense } from './modules/expenses.js
 import { getCategories, createCategory, updateCategory, deleteCategory } from './modules/categories.js';
 import { getSuppliers, createSupplier } from './modules/suppliers.js';
 import { processSale, getDashboardStats, getAdvancedStats, getSalesHistory, revertSale, getDebtors, payDebt } from './modules/sales.js';
-import { getResellers, createReseller, getResellerStock, assignStock, settleStock } from './modules/resellers.js';
+import { getResellers, createReseller, getResellerStock, assignStock, settleStock, deleteReseller } from './modules/resellers.js';
 const ui = {
     loadingOverlay: document.getElementById('loading-overlay'),
     userEmail: document.getElementById('user-email'),
@@ -1036,6 +1036,16 @@ async function loadDashboard() {
         const salesEl = document.getElementById('dash-sales');
         if (salesEl) salesEl.textContent = window.formatMoney(safeCurrency(stats.totalSales));
 
+        // Calcular valor de inventario
+        const totalCosto = state.products.reduce((acc, p) => acc + (p.cost * p.stock), 0);
+        const totalVenta = state.products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+        
+        const dashCosto = document.getElementById('dash-inventario-costo');
+        if (dashCosto) dashCosto.textContent = window.formatMoney(totalCosto);
+        
+        const dashVenta = document.getElementById('dash-inventario-venta');
+        if (dashVenta) dashVenta.textContent = window.formatMoney(totalVenta);
+
         // Advanced stats
         const { topSelling } = await getAdvancedStats();
 
@@ -1204,9 +1214,12 @@ function renderResellers() {
     }
 
     container.innerHTML = state.resellers.map(r => `
-        <div class="bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col justify-between">
+        <div class="bg-white p-6 rounded-3xl border border-stone-100 shadow-sm flex flex-col justify-between relative">
+            <button onclick="window.deleteReseller('${r.id}')" class="absolute top-4 right-4 p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors" title="Eliminar Vendedor">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
             <div>
-                <h3 class="font-bold text-stone-900 text-xl">${r.name}</h3>
+                <h3 class="font-bold text-stone-900 text-xl pr-8">${r.name}</h3>
                 <p class="text-sm text-stone-400 mt-1">${r.phone || 'Sin teléfono'}</p>
                 <div class="mt-4 inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-bold">
                     Stock Asignado: ${r.total_items} u.
@@ -1228,6 +1241,23 @@ window.openResellerModal = () => {
     document.getElementById('reseller-id').value = '';
     document.getElementById('form-reseller').reset();
     window.openModal('modal-reseller');
+};
+
+window.deleteReseller = async (id) => {
+    window.showConfirm(
+        'Eliminar Vendedor',
+        '¿Estás seguro de que deseas eliminar este vendedor? Solo podrás hacerlo si no tiene stock o deudas asociadas.',
+        async () => {
+            try {
+                await deleteReseller(id);
+                window.showToast('Vendedor eliminado', 'success');
+                await loadResellers();
+            } catch (error) {
+                window.showToast('Error al eliminar. Revisa que no tenga stock asignado ni historial pendiente.', 'error');
+                console.error(error);
+            }
+        }
+    );
 };
 
 async function handleCreateReseller(e) {
@@ -1333,6 +1363,113 @@ async function handleAssignStock(e) {
         btn.disabled = false; btn.textContent = 'Confirmar Entrega';
     }
 }
+
+window.generateRemitoPDF = () => {
+    if (state.assignCart.length === 0) return window.showToast('Agrega productos a la lista para generar el remito', 'error');
+    
+    const reseller = state.resellers.find(r => r.id === state.currentResellerId);
+    const resellerName = reseller ? reseller.name : 'Vendedor Desconocido';
+    const dateStr = new Date().toLocaleDateString('es-AR');
+    
+    // URL absoluto para que cargue en el iframe
+    const logoUrl = new URL('./src/assets/logo.png', window.location.href).href;
+    
+    const tableRowsHtml = state.assignCart.map(i => {
+        const prod = state.products.find(p => p.id === i.product_id);
+        const price = prod ? prod.price : 0;
+        return `
+        <tr>
+            <td class="text-center"><strong>${i.quantity}</strong></td>
+            <td>${i.name}</td>
+            <td class="text-right">${window.formatMoney(price)}</td>
+            <td class="text-right"><strong>${window.formatMoney(price * i.quantity)}</strong></td>
+        </tr>
+        `;
+    }).join('');
+
+    const html = `
+    <html>
+      <head>
+        <title>Remito - ${resellerName}</title>
+        <style>
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 20px; color: #000; }
+          .wrapper { border: 2px solid #000; padding: 2px; }
+          .header { display: flex; width: 100%; border: 2px solid #000; border-bottom: none; }
+          .header-left { flex: 1; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+          .header-center { width: 50px; border-left: 2px solid #000; border-right: 2px solid #000; display: flex; flex-direction: column; align-items: center; padding-top: 10px; }
+          .x-box { font-size: 40px; font-weight: bold; line-height: 1; border: 2px solid #000; padding: 2px 12px; margin-bottom: 5px; }
+          .doc-type { font-size: 7px; text-align: center; font-weight: bold; line-height: 1.1; }
+          .header-right { flex: 1; padding: 15px; display:flex; flex-direction:column; justify-content: flex-start;}
+          .header-right h2 { margin: 0 0 10px 0; font-size: 24px; letter-spacing: 2px;}
+          .reseller-info { border: 2px solid #000; border-bottom: none; padding: 10px 15px; font-size: 14px; }
+          table { width: 100%; border-collapse: collapse; border: 2px solid #000; }
+          th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 12px;}
+          th { font-weight: bold; text-transform: uppercase; border-bottom: 2px solid #000; background: #f9f9f9;}
+          .footer { border: 2px solid #000; border-top: none; padding: 10px 15px; min-height: 40px; font-size: 12px;}
+          .text-center { text-align: center; }
+          .text-right { text-align: right; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+            <div class="header">
+                <div class="header-left">
+                    <img src="${logoUrl}" style="max-height:60px; margin-bottom:10px; filter: grayscale(100%);">
+                    <h2 style="margin:0; font-size: 20px;">Tienda Colores</h2>
+                </div>
+                <div class="header-center">
+                    <div class="x-box">X</div>
+                    <div class="doc-type">DOCUMENTO<br>NO VÁLIDO<br>COMO FACTURA</div>
+                </div>
+                <div class="header-right">
+                    <h2>REMITO</h2>
+                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                        <span><strong>FECHA:</strong> ${dateStr}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reseller-info">
+                <strong>Señor(es):</strong> ${resellerName}
+            </div>
+            
+            <table>
+                <tr>
+                    <th style="width: 10%; text-align:center;">CANT.</th>
+                    <th style="width: 50%;">DETALLE</th>
+                    <th style="width: 20%; text-align:right;">PRECIO U.</th>
+                    <th style="width: 20%; text-align:right;">SUBTOTAL</th>
+                </tr>
+                ${tableRowsHtml}
+            </table>
+            
+            <div class="footer">
+                <strong>Observaciones:</strong> Mercadería entregada en consignación. Conservar este remito.
+            </div>
+        </div>
+        <script>
+            window.onload = () => {
+                setTimeout(() => {
+                    window.print();
+                }, 300);
+            };
+        </script>
+      </body>
+    </html>
+    `;
+    
+    const printFrame = document.createElement('iframe');
+    printFrame.style.display = 'none';
+    document.body.appendChild(printFrame);
+    
+    printFrame.contentDocument.write(html);
+    printFrame.contentDocument.close();
+    
+    // Limpieza post impresión
+    setTimeout(() => {
+        document.body.removeChild(printFrame);
+    }, 5000);
+};
 
 // -- Rendir Stock del Vendedor
 window.openSettleStockModal = async (id) => {
