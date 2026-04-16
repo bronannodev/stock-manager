@@ -165,6 +165,9 @@ function bindEvents() {
     ui.btnConfirmSale.addEventListener('click', handleCheckout);
     document.getElementById('btn-refresh-dash').addEventListener('click', loadDashboard);
 
+    document.getElementById('search-product-input')?.addEventListener('input', renderProductsTable);
+    document.getElementById('filter-category-select')?.addEventListener('change', renderProductsTable);
+
     // Deudores
     const isPendingCb = document.getElementById('sale-is-pending');
     const clientCont = document.getElementById('sale-client-name-container');
@@ -266,13 +269,30 @@ function renderProductsTable() {
 
     if (!tableBody || !cardsBody) return;
 
+    const searchInput = document.getElementById('search-product-input');
+    const filterSelect = document.getElementById('filter-category-select');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const filterCat = filterSelect ? filterSelect.value : '';
+
     if (state.products.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-stone-400">Tu catálogo está vacío.</td></tr>`;
         cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100">Tu catálogo está vacío.</div>`;
         return;
     }
 
-    tableBody.innerHTML = state.products.map(p => {
+    const filteredProducts = state.products.filter(p => {
+        const matchName = p.name.toLowerCase().includes(searchTerm);
+        const matchCat = filterCat === '' || p.category === filterCat;
+        return matchName && matchCat;
+    });
+
+    if (filteredProducts.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-stone-400">No se encontraron productos con esos filtros.</td></tr>`;
+        cardsBody.innerHTML = `<div class="p-8 text-center text-stone-400 bg-white rounded-3xl border border-stone-100">No se encontraron productos con esos filtros.</div>`;
+        return;
+    }
+
+    tableBody.innerHTML = filteredProducts.map(p => {
         const isLowStock = p.stock < 5;
         const stockEl = isLowStock
             ? `<span class="badge-stock-critical text-red-600 font-bold text-sm">${p.stock}</span>`
@@ -301,7 +321,7 @@ function renderProductsTable() {
     }).join('');
 
     // Render Cards (Mobile)
-    cardsBody.innerHTML = state.products.map(p => `
+    cardsBody.innerHTML = filteredProducts.map(p => `
         <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100 flex flex-col gap-3">
             <div class="flex justify-between items-start">
                 <div>
@@ -541,14 +561,24 @@ async function loadCategories() {
 
 function renderCategorySelect() {
     const select = document.getElementById('prod-category');
-    if (!select) return;
+    if (select) {
+        const currentValue = select.value;
+        select.innerHTML = '<option value="">Sin Categoría</option>' +
+            state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 
-    const currentValue = select.value;
-    select.innerHTML = '<option value="">Sin Categoría</option>' +
-        state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        if (state.categories.some(c => c.name === currentValue)) {
+            select.value = currentValue;
+        }
+    }
 
-    if (state.categories.some(c => c.name === currentValue)) {
-        select.value = currentValue;
+    const filterSelect = document.getElementById('filter-category-select');
+    if (filterSelect) {
+        const filterVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="">Todas las categorías</option>' +
+            state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        if (state.categories.some(c => c.name === filterVal)) {
+            filterSelect.value = filterVal;
+        }
     }
 }
 
