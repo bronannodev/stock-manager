@@ -27,18 +27,52 @@ export async function getDebtors() {
     return data;
 }
 
-export async function payDebt(saleId, paymentMethod) {
-    // Solo marca la deuda como pagada y documenta cómo pagó finalmente
-    const { error } = await supabase
+export async function payDebt(saleId, paymentMethod, amountPaid) {
+    // 1. Obtnemos la deuda actual
+    const { data: sale, error: fetchError } = await supabase
         .from('sales')
-        .update({ 
-            status: 'paid', 
-            payment_method: paymentMethod 
-        })
-        .eq('id', saleId);
-    
-    if (error) throw error;
-    return true;
+        .select('total_amount, client_name')
+        .eq('id', saleId)
+        .single();
+    if (fetchError) throw fetchError;
+
+    const remainingDebt = Number(sale.total_amount) - Number(amountPaid);
+
+    if (remainingDebt <= 0) {
+        // Pago Total
+        const { error } = await supabase
+            .from('sales')
+            .update({ 
+                status: 'paid', 
+                payment_method: paymentMethod 
+            })
+            .eq('id', saleId);
+        
+        if (error) throw error;
+        return true;
+    } else {
+        // Pago Parcial (Opción 1: Sin modificar la BD, separamos la venta)
+        
+        // Reducimos lo que debe en la venta "pending" original
+        const { error: updateError } = await supabase
+            .from('sales')
+            .update({ total_amount: remainingDebt })
+            .eq('id', saleId);
+        if (updateError) throw updateError;
+
+        // Creamos una nueva venta ficticia (sin items) que representa el dinero físico ingresado
+        const { error: insertError } = await supabase
+            .from('sales')
+            .insert({
+                total_amount: Number(amountPaid),
+                status: 'paid',
+                payment_method: paymentMethod,
+                client_name: (sale.client_name || 'Desconocido') + ' (Abono)'
+            });
+        
+        if (insertError) throw insertError;
+        return true;
+    }
 }
 
 export async function getDashboardStats() {

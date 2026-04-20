@@ -1318,6 +1318,15 @@
                     class="font-bold text-emerald-600"></span>.</p>
             <form id="form-settle-debt" class="space-y-4">
                 <input type="hidden" id="debt-settle-id">
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Monto a Abonar</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 font-bold">$</span>
+                        <input type="number" id="debt-settle-amount-input" step="0.01" min="0" placeholder="Ej: 500" class="input-fancy w-full pl-8 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all font-bold" required>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Método de
                         Pago Final</label>

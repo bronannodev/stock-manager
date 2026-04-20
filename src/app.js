@@ -1198,6 +1198,11 @@ window.openSettleDebtModal = (id) => {
     document.getElementById('debt-settle-client').textContent = debt.client_name || 'Desconocido';
     document.getElementById('debt-settle-amount').textContent = window.formatMoney(debt.total_amount);
     document.getElementById('debt-settle-method').value = 'efectivo';
+    
+    const amountInput = document.getElementById('debt-settle-amount-input');
+    amountInput.value = debt.total_amount;
+    amountInput.max = debt.total_amount;
+    
     window.openModal('modal-debt-settle');
 };
 
@@ -1206,16 +1211,17 @@ async function handleSettleDebt(e) {
     const btn = e.target.querySelector('button[type="submit"]');
     const id = document.getElementById('debt-settle-id').value;
     const method = document.getElementById('debt-settle-method').value;
+    const amountPaid = document.getElementById('debt-settle-amount-input').value;
 
     try {
         btn.disabled = true; btn.textContent = 'Procesando...';
-        await payDebt(id, method);
-        showToast('Deuda saldada correctamente', 'success');
+        await payDebt(id, method, amountPaid);
+        showToast('Deuda saldada / abonada correctamente', 'success');
         window.closeModal();
         await loadDebtors();
         await loadDashboard(); // En caso que sume a estadísticas o queremos recargar
     } catch (err) {
-        showToast('Error al saldar la deuda', 'error');
+        showToast('Error al procesar el pago', 'error');
     } finally {
         btn.disabled = false; btn.textContent = 'Confirmar Pago';
     }
