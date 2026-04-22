@@ -591,9 +591,17 @@
             <!-- Selector de producto -->
             <div class="bg-white p-5 rounded-3xl shadow-sm border border-stone-100 mb-5">
                 <h3 class="font-semibold text-stone-800 mb-4">Agregar al carrito</h3>
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <select id="sale-product-select"
-                        class="flex-1 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all"></select>
+                <div class="flex flex-col sm:flex-row gap-3 overflow-visible">
+                    <div class="flex-1 relative">
+                        <div class="relative">
+                            <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input type="text" id="sale-product-search" placeholder="Escribe para buscar un producto..."
+                                class="w-full pl-10 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all" autocomplete="off">
+                        </div>
+                        <ul id="sale-product-suggestions" class="hidden absolute z-50 w-full mt-2 bg-white border border-stone-200 rounded-2xl shadow-2xl max-h-60 overflow-y-auto divide-y divide-stone-100">
+                        </ul>
+                        <input type="hidden" id="sale-selected-product-id">
+                    </div>
                     <input type="number" id="sale-qty" value="1" min="1"
                         class="w-full sm:w-24 p-3.5 bg-stone-50 border border-stone-200 rounded-2xl text-center text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400 transition-all">
                     <button id="btn-add-to-cart"

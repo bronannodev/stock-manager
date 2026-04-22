@@ -21,7 +21,9 @@ const ui = {
     navBtns: document.querySelectorAll('.nav-btn'),
     sections: document.querySelectorAll('.view-section'),
     productsTableBody: document.getElementById('products-table-body'),
-    saleProductSelect: document.getElementById('sale-product-select'),
+    saleProductSearch: document.getElementById('sale-product-search'),
+    searchSuggestions: document.getElementById('sale-product-suggestions'),
+    selectedProductId: document.getElementById('sale-selected-product-id'),
     cartBody: document.getElementById('cart-body'),
     btnConfirmSale: document.getElementById('btn-confirm-sale'),
     mobileMenuBtn: document.getElementById('mobile-menu-btn'),
@@ -168,6 +170,16 @@ function bindEvents() {
     document.getElementById('search-product-input')?.addEventListener('input', renderProductsTable);
     document.getElementById('filter-category-select')?.addEventListener('change', renderProductsTable);
 
+    if (ui.saleProductSearch) {
+        ui.saleProductSearch.addEventListener('input', handleSaleSearchInput);
+        ui.saleProductSearch.addEventListener('focus', handleSaleSearchFocus);
+        document.addEventListener('click', (e) => {
+            if (!ui.saleProductSearch.contains(e.target) && !ui.searchSuggestions.contains(e.target)) {
+                ui.searchSuggestions.classList.add('hidden');
+            }
+        });
+    }
+
     // Deudores
     const isPendingCb = document.getElementById('sale-is-pending');
     const clientCont = document.getElementById('sale-client-name-container');
@@ -256,7 +268,6 @@ async function loadProducts() {
     try {
         state.products = await getProducts();
         renderProductsTable();
-        renderProductSelect();
     } catch (error) {
         showToast('Error cargando productos. Revisa la consola.', 'error');
         console.error(error);
@@ -306,6 +317,9 @@ function renderProductsTable() {
             <td class="p-4">${stockEl}</td>
             <td class="p-4">
                 <div class="flex items-center gap-2 justify-end">
+                    <button onclick="window.addToCartFromInventory('${p.id}')" class="p-1.5 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-colors" title="Añadir al carrito">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </button>
                     <button onclick="window.openStockModal('${p.id}')" class="p-1.5 bg-emerald-50 text-emerald-500 rounded-lg hover:bg-emerald-100 transition-colors" title="Ingresar Stock">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     </button>
@@ -342,7 +356,10 @@ function renderProductsTable() {
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-1">
+            <div class="flex justify-end gap-2 pt-1 border-stone-50 overflow-x-auto">
+                <button onclick="window.addToCartFromInventory('${p.id}')" class="w-12 shrink-0 p-2 bg-stone-100 text-stone-600 font-medium rounded-xl hover:bg-stone-200 transition-colors flex justify-center items-center" title="Al Carrito">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </button>
                 <button onclick="window.openStockModal('${p.id}')" class="flex-1 p-2 bg-emerald-50 text-emerald-600 font-medium rounded-xl hover:bg-emerald-100 transition-colors flex justify-center items-center gap-2" title="Ingresar Stock">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     Stock
@@ -351,7 +368,7 @@ function renderProductsTable() {
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     Editar
                 </button>
-                <button onclick="window.deleteProduct('${p.id}')" class="w-12 p-2 bg-red-50 text-red-500 font-medium rounded-xl hover:bg-red-100 transition-colors flex justify-center items-center" title="Eliminar">
+                <button onclick="window.deleteProduct('${p.id}')" class="w-12 shrink-0 p-2 bg-red-50 text-red-500 font-medium rounded-xl hover:bg-red-100 transition-colors flex justify-center items-center" title="Eliminar">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             </div>
@@ -806,18 +823,63 @@ async function handleCreateExpense(e) {
 }
 
 // 5. Lógica de Ventas
-function renderProductSelect() {
-    ui.saleProductSelect.innerHTML = '<option value="">Selecciona un producto...</option>' +
-        state.products
-            .map(p => `<option value="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}>${p.name} - ${window.formatMoney(p.price)} (Stock: ${p.stock})</option>`)
-            .join('');
+function handleSaleSearchInput(e) {
+    const term = e.target.value.toLowerCase().trim();
+    ui.selectedProductId.value = ''; 
+    
+    if (!term) {
+        ui.searchSuggestions.classList.add('hidden');
+        return;
+    }
+    
+    const matches = state.products.filter(p => p.name.toLowerCase().includes(term));
+    renderSaleSuggestions(matches);
 }
 
+function handleSaleSearchFocus(e) {
+    if (!e.target.value.trim()) {
+        const available = state.products.slice(0, 15);
+        if (available.length > 0) renderSaleSuggestions(available);
+    } else {
+        ui.saleProductSearch.dispatchEvent(new Event('input'));
+    }
+}
+
+function renderSaleSuggestions(matches) {
+    if (matches.length === 0) {
+        ui.searchSuggestions.innerHTML = '<li class="p-4 text-center text-stone-500 text-sm">No se encontraron productos</li>';
+        ui.searchSuggestions.classList.remove('hidden');
+        return;
+    }
+    
+    ui.searchSuggestions.innerHTML = matches.map(p => {
+        const isOutOfStock = p.stock <= 0;
+        return `
+            <li class="p-3 hover:bg-stone-50 cursor-pointer flex justify-between items-center transition-colors ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}"
+                ${!isOutOfStock ? `onclick="window.selectSaleProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}')"` : ''}>
+                <div>
+                    <span class="font-medium text-stone-800 block">${p.name}</span>
+                    <span class="text-xs text-stone-500">Stock: ${p.stock}</span>
+                </div>
+                <span class="font-bold text-emerald-600">${window.formatMoney(p.price)}</span>
+            </li>
+        `;
+    }).join('');
+    ui.searchSuggestions.classList.remove('hidden');
+}
+
+window.selectSaleProduct = (id, name) => {
+    ui.selectedProductId.value = id;
+    ui.saleProductSearch.value = name;
+    ui.searchSuggestions.classList.add('hidden');
+    document.getElementById('sale-qty').focus(); 
+};
+
 function addToCart() {
-    const prodId = ui.saleProductSelect.value;
+    const prodId = ui.selectedProductId.value;
     const qty = parseInt(document.getElementById('sale-qty').value);
 
-    if (!prodId) return showToast('Selecciona un producto', 'error');
+    if (!prodId) return showToast('Selecciona un producto de la lista', 'error');
 
     const product = state.products.find(p => p.id === prodId);
     if (!product || qty <= 0) return;
@@ -836,6 +898,11 @@ function addToCart() {
         });
     }
     renderCart();
+
+    ui.selectedProductId.value = '';
+    ui.saleProductSearch.value = '';
+    document.getElementById('sale-qty').value = '1';
+    ui.saleProductSearch.focus();
 }
 
 function renderCart() {
@@ -856,7 +923,9 @@ function renderCart() {
         cartBody.innerHTML = state.cart.map((item, index) => `
             <tr class="table-row-anim border-b border-stone-50">
                 <td class="p-4 font-medium">${item.name}</td>
-                <td class="p-4 text-center">${item.quantity}</td>
+                <td class="p-4 text-center">
+                    <input type="number" min="1" value="${item.quantity}" onchange="window.updateCartItemQty(${index}, this.value)" class="w-16 p-1 text-center bg-stone-50 border border-stone-200 rounded-lg text-stone-700 focus:outline-none focus:border-stone-400">
+                </td>
                 <td class="p-4 text-right text-stone-500">${window.formatMoney(item.unit_price)}</td>
                 <td class="p-4 text-right font-bold">${window.formatMoney(item.quantity * item.unit_price)}</td>
                 <td class="p-4 text-right">
@@ -874,7 +943,10 @@ function renderCart() {
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center gap-3">
                 <div class="flex-1">
                     <p class="font-bold text-stone-900">${item.name}</p>
-                    <p class="text-sm text-stone-500 mt-0.5">${item.quantity} u. &times; ${window.formatMoney(item.unit_price)}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <input type="number" min="1" value="${item.quantity}" onchange="window.updateCartItemQty(${index}, this.value)" class="w-16 p-1 text-center bg-stone-50 border border-stone-200 rounded-lg text-sm text-stone-700 focus:outline-none focus:border-stone-400">
+                        <p class="text-sm text-stone-500">&times; ${window.formatMoney(item.unit_price)}</p>
+                    </div>
                 </div>
                 <p class="font-black text-stone-900 text-lg">${window.formatMoney(item.quantity * item.unit_price)}</p>
                 <button onclick="window.removeFromCart(${index})" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition-colors shrink-0">
@@ -889,6 +961,48 @@ function renderCart() {
 
 window.removeFromCart = (index) => {
     state.cart.splice(index, 1);
+    renderCart();
+};
+
+window.updateCartItemQty = (index, newQty) => {
+    const qty = parseInt(newQty);
+    if (!qty || qty <= 0) {
+        showToast('Cantidad inválida', 'error');
+        renderCart(); 
+        return;
+    }
+    
+    const item = state.cart[index];
+    const product = state.products.find(p => p.id === item.product_id);
+    
+    if (qty > product.stock) {
+        showToast('Stock insuficiente. Disponible: ' + product.stock, 'error');
+        renderCart(); 
+        return;
+    }
+
+    item.quantity = qty;
+    renderCart();
+};
+
+window.addToCartFromInventory = (productId) => {
+    const product = state.products.find(p => p.id === productId);
+    if (!product) return;
+    if (product.stock <= 0) return showToast('Producto sin stock', 'error');
+
+    const existingItem = state.cart.find(i => i.product_id === productId);
+    if (existingItem) {
+        if (existingItem.quantity + 1 > product.stock) return showToast('Supera el stock actual', 'error');
+        existingItem.quantity += 1;
+    } else {
+        state.cart.push({
+            product_id: product.id,
+            name: product.name,
+            quantity: 1,
+            unit_price: product.price
+        });
+    }
+    showToast('Añadido al carrito', 'success');
     renderCart();
 };
 
